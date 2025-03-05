@@ -50,5 +50,5 @@ coords <- cbind(runif(n = 100, min = 47, max = 47.5),
                 runif(n = 100, min = 34, max = 35))
 elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
-print(elev2)
+head(elev2)
 ```

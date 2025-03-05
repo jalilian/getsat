@@ -3,3 +3,4 @@
 export(get_cams)
 export(get_dem)
 export(get_era5_land)
+export(get_lulc)
