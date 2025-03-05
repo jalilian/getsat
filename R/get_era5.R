@@ -1,8 +1,8 @@
 #' Download ERA5-Land Climate Data
 #'
-#' This function retrieves ERA5-Land data from the Copernicus Data Store via the ECMWF API. 
-#' ERA5-Land provides a detailed, long-term record of land surface variables from 1950 to the present. 
-#' It is derived from the ERA5 climate reanalysis model, using both model data and observations, 
+#' This function retrieves ERA5-Land data from the Copernicus Data Store via the ECMWF API.
+#' ERA5-Land provides a detailed, long-term record of land surface variables from 1950 to the present.
+#' It is derived from the ERA5 climate reanalysis model, using both model data and observations,
 #' and adjusted for elevation.
 #'
 #' @param key A character string representing the ECMWF API key associated with your user account.
@@ -20,18 +20,18 @@
 #'   \item "leaf_area_index_high_vegetation", "leaf_area_index_low_vegetation", "high_vegetation_cover", "low_vegetation_cover"
 #'   \item "lake_total_depth", "land_sea_mask", "soil_type", "type_of_high_vegetation", "type_of_low_vegetation"
 #' }
-#' @param area A numeric vector of length 4 defining the bounding box for the region of interest, 
+#' @param area A numeric vector of length 4 defining the bounding box for the region of interest,
 #'             in the format `c(North, West, South, East)`. Coordinates must fall within:
 #'             - North: 90.0° N
 #'             - South: -90.0° N
 #'             - West: -180.0° W
 #'             - East: 180.0° W
 #' @param year A numeric value specifying the year to retrieve data for (from 1950 onwards).
-#' @param month A numeric or character vector specifying the months to retrieve (default: all months in the year). 
+#' @param month A numeric or character vector specifying the months to retrieve (default: all months in the year).
 #'              Values are automatically formatted as two-digit strings (e.g., `"01"`, `"02"`).
 #' @param day A numeric or character vector specifying the days to retrieve (default: all days for the specified months).
 #'            Values are automatically formatted as two-digit strings (e.g., `"01"`, `"02"`).
-#' @param time A character vector specifying the hours to retrieve (default: all 24 hours of the day). 
+#' @param time A character vector specifying the hours to retrieve (default: all 24 hours of the day).
 #'             The values are automatically formatted as two-digit hour strings (e.g., `"00:00"`, `"01:00"`).
 #' @param agglevel A character string specifying the temporal aggregation level.
 #'   Options are:
@@ -50,14 +50,14 @@
 #'       \item `"10days"`
 #'       \item `"15days"`
 #'     }
-#' @param temp_dir A character string specifying a temporary directory for downloaded 
-#'   and extracted files. If `NULL` (default), the system's temporary directory 
+#' @param temp_dir A character string specifying a temporary directory for downloaded
+#'   and extracted files. If `NULL` (default), the system's temporary directory
 #'   (`tempdir()`) is used.
 #'
 #' @return A `SpatRaster` object containing the downloaded air quality data.
 #'
-#' @details This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to 
-#'          approximately 2-3 months before the present. The data is processed into a `SpatRaster` object for spatial analysis. 
+#' @details This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to
+#'          approximately 2-3 months before the present. The data is processed into a `SpatRaster` object for spatial analysis.
 #'          Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.
 #'
 #' @examples
@@ -82,18 +82,9 @@
 #'
 #' @author Abdollah Jalilian
 #'
-#' @importFrom terra
-#' 
 #' @export
-get_era5_land <- function(key, 
-                     vars,
-                     area, 
-                     year, 
-                     month = NULL,
-                     day = NULL,
-                     time = NULL,
-                     agglevel="days",
-                     temp_dir = NULL)
+get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
+                          time = NULL, agglevel="days", temp_dir = NULL)
 {
   # ERA5-Land climate variables
   c_vars <- c(
@@ -157,16 +148,16 @@ get_era5_land <- function(key,
     "type_of_high_vegetation",  # Type of high vegetation (categorical)
     "type_of_low_vegetation"   # Type of low vegetation (categorical)
   )
-  
+
   # check if all specified variables are in the valid list of variables
   if (!all(vars %in% c_vars))
-    stop("Invalid value(s) in 'vars'. Allowed values are: ", 
+    stop("Invalid value(s) in 'vars'. Allowed values are: ",
          paste(c_vars, collapse = ", "))
-  
+
   # validate the year
   if (any(year < 1940))
     stop("Data is only available form January 1940")
-  
+
   # validate the month
   valid_months <- sprintf("%02d", 1:12)
   if (is.null(month))
@@ -174,9 +165,9 @@ get_era5_land <- function(key,
   else
     month <- sprintf("%02d", month)
   if (!all(month %in% valid_months))
-    stop("Invalid value(s) in 'month'. Allowed values are: ", 
+    stop("Invalid value(s) in 'month'. Allowed values are: ",
          paste(valid_months, collapse = ", "))
-  
+
   # validate the day
   valid_days <- sprintf("%02d", 1:31)
   if (is.null(day))
@@ -184,21 +175,21 @@ get_era5_land <- function(key,
   else
     day <- sprintf("%02d", day)
   if (!all(day %in% valid_days))
-    stop("Invalid value(s) in 'day'. Allowed values are: ", 
+    stop("Invalid value(s) in 'day'. Allowed values are: ",
          paste(valid_days, collapse = ", "))
-  
+
   # validate the time
   valid_times <- sprintf("%02d:00", 0:23)
   if (is.null(time))
     time <- valid_times
   if (!all(time %in% valid_times))
-    stop("Invalid value(s) in 'time'. Allowed values are: ", 
+    stop("Invalid value(s) in 'time'. Allowed values are: ",
          paste(valid_times, collapse = ", "))
-  
+
   # set ECMWF authentication
   user <- "ecmwfr"
   wf_set_key(key = key, user = user)
-  
+
   # create a temporary directory to downloaded and extract files
   if (is.null(temp_dir))
     temp_dir <- tempdir()
@@ -206,15 +197,15 @@ get_era5_land <- function(key,
   {
     dir.create(temp_dir)
   }
-  
+
   # Define output filename
   dfile <- paste0("cams_hourly_", year, "_", month, ".zip")
-  
+
   # request for getting data
   request <- list(
     # dataset name
     dataset_short_name = "reanalysis-era5-land",
-    # air quality variables 
+    # air quality variables
     variable = vars,
     # temporal framework: year, month, day, hour
     year = as.character(year),
@@ -229,28 +220,28 @@ get_era5_land <- function(key,
     # output file name
     target = dfile
   )
-  
+
   # Validate request and credentials
   wf_check_request(request = request)
-  
+
   # Download data
   out_file <- wf_request(
-    user = user, 
+    user = user,
     request = request,
-    transfer = TRUE, 
+    transfer = TRUE,
     path = getwd(),
     time_out = 3 * 60 * 60,
     verbose = TRUE
   )
-  
+
   # create a SpatRaster object from the downloaded data file
   rdata <- terra::rast(out_file)
-  
+
   # perform temporal aggregation if specified
   if (!is.null(agglevel))
   {
     rdata <- terra::tapp(rdata, index=agglevel, fun="mean")
   }
-  
+
   return(rdata)
 }

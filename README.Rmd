@@ -1,0 +1,54 @@
+---
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# getsat: Retrieving Commonly Used Satellite Data
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+`getsat` is an R package designed to simplify access to commonly used satellite data on environmental variables. It provides an easy way to retrieve, process, and integrate satellite-based data from sources such as:
+- Copernicus Atmosphere Monitoring Service
+- Copernicus Climate Data Store
+- Microsoft Planetary Computer
+
+
+## Installation
+
+You can install the development version of getsat from [GitHub](https://github.com/) using the [pak](https://CRAN.R-project.org/package=pak) package:
+```r
+# Install pak if not already installed
+install.packages("pak")
+
+# Install getsat from GitHub
+pak::pak("jalilian/getsat")
+```
+
+## Example: Retrieve Elevation Data
+
+The following example shows how to retrieve elevation data from the Copernicus Digital Elevation Model (DEM). You can specify either a bounding box for an area of interest or provide specific coordinates.
+
+```{r example}
+library("getsat")
+
+# Retrieve elevation data for a bounding box (longitude/latitude)
+elev1 <- get_dem(c(34, 47, 35, 48), res = 90)
+# plot retrived elevation data
+terra::plot(elev1)
+
+# Retrieve elevation for specific coordinate points
+coords <- cbind(runif(n = 100, min = 34, max = 35), 
+                runif(n = 100, min = 47, max = 48))
+elev2 <- get_dem(coords, res = 90)
+# Print retrieved elevation values
+print(elev2)
+```
