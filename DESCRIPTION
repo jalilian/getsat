@@ -1,9 +1,9 @@
-Package: myPKG
-Title: What the Package Does (One Line, Title Case)
+Package: getsat
+Title: Retrieving Commonly Used Satellite Data
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Abdollah", "Jalilian", , "stat4aj@gmail.com", role = c("aut", "cre"))
+Description: This R package simplifies access to key satellite data on environmental variables from sources like the Copernicus Atmosphere Monitoring Service, Copernicus Climate Data Store, and Microsoft Planetary Computer. It streamlines data retrieval, processing, and integration, making satellite-based environmental analysis more efficient and accessible.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
