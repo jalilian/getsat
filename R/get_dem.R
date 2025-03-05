@@ -100,10 +100,21 @@ get_dem <- function(where,
                   function(o)
                   {
                     r <- terra::rast(o$assets$data$href)
-                    terra::crop(r, terra::ext(bbox, xy=TRUE))
+                    w <- terra::ext(bbox, xy=TRUE)
+                    w <- terra::intersect(terra::ext(r), w)
+                    terra::crop(r, w)
                   })
-  # merge raster tiles into a single raster
-  rdata <- do.call(terra::mosaic, c(rdata, list(fun="mean")))
+
+  if (length(rdata) == 1)
+  {
+    rdata <- rdata[[1]]
+  } else{
+    # merge raster tiles into a single raster,  if more than one tile
+    rdata <- do.call(terra::mosaic, c(rdata, list(fun="modal")))
+  }
+
+  # projection to EPSG:4326 (World Geodetic System 1984, WGS84)
+  rdata <- terra::project(rdata, "EPSG:4326")
 
   # if 'where' is a matrix/data frame, extract elevation values for points
   if (inherits(where, c("matrix", "data.frame")))

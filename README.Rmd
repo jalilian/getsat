@@ -41,13 +41,13 @@ The following example shows how to retrieve elevation data from the Copernicus D
 library("getsat")
 
 # Retrieve elevation data for a bounding box (longitude/latitude)
-elev1 <- get_dem(c(34, 47, 35, 48), res = 90)
+elev1 <- get_dem(c(47, 34, 47.5, 35), res=90)
 # plot retrived elevation data
 terra::plot(elev1)
 
 # Retrieve elevation for specific coordinate points
-coords <- cbind(runif(n = 100, min = 34, max = 35), 
-                runif(n = 100, min = 47, max = 48))
+coords <- cbind(runif(n = 100, min = 47, max = 47.5), 
+                runif(n = 100, min = 34, max = 35))
 elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
 print(elev2)
