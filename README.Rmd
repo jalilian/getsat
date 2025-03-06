@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-You can install the development version of getsat from [GitHub](https://github.com/) using the [pak](https://CRAN.R-project.org/package=pak) package:
+To install the development version of `getsat` from [GitHub](https://github.com/), use the [pak](https://CRAN.R-project.org/package=pak) package:
 ```r
 # Install pak if not already installed
 install.packages("pak")
@@ -33,11 +33,10 @@ install.packages("pak")
 pak::pak("jalilian/getsat")
 ```
 
-## Example: Retrieve Elevation Data
+## Example 1: Retrieve Elevation Data
 
-The following example shows how to retrieve elevation data from the Copernicus Digital Elevation Model (DEM). You can specify either a bounding box for an area of interest or provide specific coordinates.
-
-```{r example}
+The following example shows  how to retrieve elevation data from the Copernicus Digital Elevation Model (DEM). You can specify a bounding box for an area of interest or provide specific coordinates.
+```{r example1}
 library("getsat")
 
 # Retrieve elevation data for a bounding box (longitude/latitude)
@@ -51,4 +50,15 @@ coords <- cbind(runif(n = 100, min = 47, max = 47.5),
 elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
 head(elev2)
+```
+
+## Example 2: Retrieve Elevation Data
+
+This example shows how to retrieve 8-day daytime temperature data from the Moderate Resolution Imaging Spectroradiometer (MODIS). You can specify a bounding box or coordinates, and provide the desired time period in the format "YYYY-MM-DD/YYYY-MM-DD".
+```{r example2}
+# Retrieve temperature data for a bounding box (longitude/latitude) and specific time period
+temp <- get_modis(c(47, 34, 47.5, 35), var = "LST_Day_1KM",
+                  datetime = "2024-12-01/2025-01-28")
+# plot retrived temperature data
+terra::plot(temp)
 ```

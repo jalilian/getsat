@@ -1,9 +1,51 @@
 #' Retrive MODIS Data
 #'
+#' Access and download the Moderate Resolution Imaging Spectroradiometer (MODIS)
+#' satellite data, available through the Microsoft's Planetary Computer STAC API.
+#' It uses the STAC API, processes the retrieved raster data, and optionally
+#' extracts values for given spatial points.
+#'
+#' @param where A numeric vector of length 4 representing the bounding box in the
+#'        form c(xmin, ymin, xmax, ymax) or a matrix/data.frame with two columns
+#'      (longitude, latitude) representing points of interest.
+#'
+#' @param var A character string specifying the MODIS variable to be retrieved.
+#'        see the details for more explanation.
+#'
+#' @param datetime A character string specifying the date range in the format
+#'        "YYYY-MM-DD/YYYY-MM-DD".
+#'
+#' @param collection A character string specifying the name of the MODIS collection
+#'        from which the variable should be retrieved. If `NULL` (default), the
+#'        function will automatically determine the appropriate collection based
+#'        on the selected variable.
+#'
+#' @param crop Logical, whether to crop the retrieved raster data to the bounding box. Default is TRUE.
+#'
+#' @param w Window size for the moving window method to fill missing (NA) values using the `focal` function from the `terra` package.
+#'        If `w = NA` (default), missing values are not filled. See the documentation of `terra::focal` for more details.
+#'
+#' @param agglevel A character string specifying the temporal aggregation level for the retrieved data, using the `aggregate` function
+#'        in the `terra` package. Available options include:
+#'        - `NULL` (no aggregation)
+#'        - `"years"`, `"months"`, `"yearmonths"`
+#'        - `"dekads"` (10-day periods), `"yeardekads"`
+#'        - `"weeks"` (ISO 8601 week number), `"yearweeks"`
+#'        - `"days"` (default), `"doy"` (day of the year)
+#'        - `"7days"`, `"10days"`, `"15days"`
+#'
+#' @param output_dir A character string specifying the directory where downloaded files should be saved.
+#'                   Default is a temporary directory.
+#'
+#' @param clean_dir Logical, whether to clean the output directory before downloading new files. Default is FALSE.
+#'
 #' @details
 #'
-#' The following table provides information on available MODIS collections and
-#' their corresponding variables:
+#' This function allows users to retrieve MODIS satellite data for specified
+#' geographic regions and time periods. MODIS provides various environmental
+#' datasets, such as land surface temperature, vegetation indices, burned areas,
+#' and primary productivity. The following table provides information on available
+#' MODIS collections and their corresponding variables:
 #'
 #' \tabular{lll}{
 #'   \strong{id} \tab \strong{title} \tab \strong{vars} \cr
@@ -28,64 +70,93 @@
 #'   modis-10A1-061 \tab MODIS Snow Cover Daily \tab hdf, NDSI, metadata, orbit_pnt, granule_pnt, NDSI_Snow_Cover, Snow_Albedo_Daily_Tile, NDSI_Snow_Cover_Basic_QA, NDSI_Snow_Cover_Algorithm_Flags_QA
 #' }
 #'
+#' MODIS data is available for different time intervals (daily, 8-day, 16-day,
+#' or yearly) and is provided in 10° x 10° tiles at the equator.
 #'
+#' @examples
+#' \dontrun{
+#'   # Retrieve 8-day daytime 1km grid land surface temperature for a bounding box
+#'   temp <- get_modis(c(-3, 5, -2, 6), var = "LST_Day_1KM",
+#'                     datetime = "2023-11-01/2024-02-28")
+#'   plot(temp)
+#'
+#'   # Retrieve yearly total evapotranspiration for specific coordinates
+#'   coords <- cbind(runif(n = 100, -3, -2), runif(n = 100, 5, 6))
+#'   et_points <- get_modis(coords, var="ET_500m",
+#'                         datetime = "2023-11-01/2024-02-28")
+#'   print(et_points)
+#' }
+#'
+#' @seealso \link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}
+#'
+#' @author Abdollah Jalilian
+#'
+#' @export
 get_modis <- function(where,
                       var,
                       datetime,
+                      collection=NULL,
+                      crop=TRUE,
+                      w=NA,
+                      agglevel=NULL,
                       output_dir=tempdir(),
                       clean_dir=FALSE)
-{library(rstac)
-
-  # Connect to the Microsoft Planetary Computer STAC API
-  collecs <- rstac::stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1"
-    ) |>
-    # Retrieve all collections
-    rstac::collections() |>
-    # HTTP GET requests to STAC web services
-    rstac::get_request() |>
-    # allow access assets from Microsoft's Planetary Computer
-    rstac::items_sign(sign_fn=rstac::sign_planetary_computer())
-
-  # extract id and title of collections
-  collecs_modis <- do.call(rbind, lapply(collecs$collections, function(o) {
-    data.frame(id = o$id, title = o$title, stringsAsFactors=FALSE)
-  }))
-  # filter MODIS collections
-  idx <- grepl("^modis", collecs_modis$id)
-  if (!any(idx))
-    stop("No MODIS collections found.")
-  collecs_modis <- collecs_modis[idx, ]
-
-  # extract available variables
-  collecs_modis$vars <- lapply(collecs$collections[idx], function(o) names(o$item_assets))
-
-
-  var <- "LST_Day_1KM"
-
-  # search for the target variable
-  idx <- vapply(collecs_modis$vars, function(o) var %in% o, logical(1))
-  if (sum(idx) > 0)
+{
+  # validate input: bounding box or coordinate matrix/data frame
+  if (is.numeric(where) && length(where) == 4)
   {
-    found_in <- collecs_modis$id[idx]
-    message(var, " has been found in collection(s): ", paste(found_in, collapse = ", "))
-  } else{
-    stop(var, " was not found in any collection.")
+    bbox <- where
+  } else if (inherits(where, c("matrix", "data.frame")) && ncol(where) == 2)
+  {
+    bbox <- c(
+      min(where[, 1]) - 0.15, min(where[, 2]) - 0.15,
+      max(where[, 1]) + 0.15, max(where[, 2]) + 0.15
+    )
+  } else {
+    stop("'where' must be a numeric vector of length 4 (bounding box) or a matrix/data.frame with two columns (longitude, latitude).")
+  }
+
+  # validate bounding box format
+  if (bbox[1] >= bbox[3] || bbox[2] >= bbox[4])
+    stop("Bounding box must be in the format c(xmin, ymin, xmax, ymax) with valid coordinates.")
+
+  # validate the variable name: var
+  if (!is.character(var) || length(var) != 1)
+    stop("'var' must be a character string of length one.")
+
+  if (is.null(collection))
+  {
+    # get all MODIS collections and variable on Microsoft's Planetary Computer
+    collecs_modis <- check_modis()
+
+    # search for the target variable
+    idx <- vapply(collecs_modis$vars,
+                  function(o) var %in% o, logical(length(var)))
+    if (sum(idx) > 0)
+    {
+      collection <- collecs_modis$id[idx]
+      message(var, " has been found in collection(s): ",
+              paste(collection, collapse = ", "))
+    } else{
+      stop(var, " was not found in any collection.")
+    }
   }
 
 
-
+  # Connect to the Microsoft Planetary Computer STAC API
   items <- rstac::stac(
     "https://planetarycomputer.microsoft.com/api/stac/v1"
   ) |>
     # STAC search API
     rstac::stac_search(
       # collection IDs to include in the search for items
-      collections = cc,
+      collections = collection,
       # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
       bbox = bbox,
+      # date-time range
+      datetime = datetime,
       # maximum number of results
-      #limit = 999
+      limit = 999
     ) |>
     # HTTP GET requests to STAC web services
     rstac::get_request() |>
@@ -94,57 +165,73 @@ get_modis <- function(where,
     # fetch all STAC Items
     rstac::items_fetch()
 
-  modis_collections <- c(
-    "modis-64A1-061", "modis-17A2H-061", "modis-11A2-061", "modis-17A2HGF-061",
-    "modis-17A3HGF-061", "modis-09A1-061", "modis-16A3GF-061", "modis-21A2-061",
-    "modis-43A4-061", "modis-09Q1-061", "modis-14A1-061", "modis-13Q1-061",
-    "modis-14A2-061", "modis-15A2H-061", "modis-11A1-061", "modis-15A3H-061",
-    "modis-13A1-061", "modis-10A2-061", "modis-10A1-061"
-  )
+  ids <- do.call(rbind, lapply(items$features,
+                function(o){
+                  # Split by "." and extract date and tile
+                  parts <- strsplit(o$id, "\\.")[[1]]
+                  # date: year and day of the year
+                  date <- as.Date(parts[2], format = "A%Y%j")
+                  # horizontal tile number, vertical tile number
+                  tile <- parts[3]
+                  return(data.frame(collection=parts[1], date=date, tile=tile))
+                }))
 
-  # retrieve DEM tiles from Microsoft Planetary Computer
-  items <- rstac::stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1"
-  ) |>
-    # STAC search API
-    rstac::stac_search(
-      # collection IDs to include in the search for items
-      collections = paste0("cop-dem-glo-", res),
-      # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-      #bbox = bbox,
-      # maximum number of results
-      #limit = 999
-    ) |>
-    # HTTP GET requests to STAC web services
-    rstac::get_request() |>
-    # allow access assets from Microsoft's Planetary Computer
-    rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
-    # fetch all STAC Items
-    rstac::items_fetch() |>
-    # download items
-    rstac::assets_download(asset_names="data",
-                           overwrite=TRUE,
-                           output_dir=output_dir)
+  # download items for the slected var(s)
+  items <- items |>
+    rstac::assets_select(asset_names=var) |>
+    rstac::assets_download(asset_names = var,
+                           items_max=length(items$features),
+                           overwrite=TRUE, output_dir=output_dir)
 
+  # load and process rasters
+  rdata <- lapply(items$features, function(o){
+    r <- terra::rast(o$assets[[var]]$href)
+    if (crop)
+    {
+      # project the extent to match the raster's CRS
+      pbx <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+      w <- terra::intersect(terra::ext(r), pbx)
+      r <- terra::crop(r, pbx)
+    }
+    return(r)
+  })
 
-  items <- stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1") %>%
-    # STAC search API
-    stac_search(
-      # collection IDs to include in the search for items
-      collections = collections,
-      # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-      bbox = bbox,
-      # date-time range
-      datetime = datetime,
-      # maximum number of results
-      limit = 999
-    ) %>%
-    # HTTP GET requests to STAC web services
-    get_request() %>%
-    # allow access assets from Microsoft's Planetary Computer
-    items_sign(sign_fn=sign_planetary_computer()) %>%
-    # fetch all STAC Items
-    items_fetch()
+  # group rasters by date and mosaic them if needed
+  rdata <- lapply(split(rdata, ids$date), function(x){
+    if (length(x) == 1)
+    {
+      x[[1]]
+    } else{
+      # merge raster tiles into a single raster,  if more than one tile
+      do.call(terra::mosaic, c(x, list(fun="mean")))
+    }
+  })
 
+  # assign dates to reasters
+  rdata <- mapply(function(r, d) {
+    terra::time(r) <- as.Date(d);
+    return(r)
+  }, rdata, names(rdata), SIMPLIFY=FALSE)
+  # convert list of rasters to one multi-layer raster
+  rdata <- terra::rast(rdata)
+  if (!is.na(w))
+  {
+    rdata <- terra::focal(rdata, w=w, fun="mean", na.policy="only", na.rm=TRUE)
+  }
+  # perform temporal aggregation if specified
+  if (!is.null(agglevel))
+    rdata <- terra::tapp(rdata, index=agglevel, fun="mean")
+
+  # projection to EPSG:4326 (World Geodetic System 1984, WGS84)
+  rdata <- terra::project(rdata, "EPSG:4326")
+
+  # if 'where' is a matrix/data frame, extract var values for points
+  if (inherits(where, c("matrix", "data.frame")))
+  {
+    where <- data.frame(where)
+    rdata <- terra::extract(rdata, where, ID=FALSE)
+    names(rdata) <- paste(var, names(rdata), sep="_")
+    rdata <- data.frame(where, rdata)
+  }
+  return(rdata)
 }
