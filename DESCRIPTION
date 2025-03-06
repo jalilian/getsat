@@ -12,3 +12,5 @@ Imports:
     ecmwfr,
     rstac,
     terra
+URL: https://github.com/jalilian/getsat
+BugReports: https://github.com/jalilian/getsat/issues
