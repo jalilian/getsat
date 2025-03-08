@@ -7,10 +7,18 @@
 `getsat` is an R package designed to simplify access to commonly used
 satellite data on environmental variables. It provides an easy way to
 retrieve, process, and integrate satellite-based data from sources such
-as: - [Copernicus Climate Data
-Store](https://cds.climate.copernicus.eu) - [Copernicus Atmosphere Data
-Store](https://ads.atmosphere.copernicus.eu) - [Microsoft Planetary
-Computer](https://planetarycomputer.microsoft.com)
+as:
+
+- [Copernicus Climate Data Store](https://cds.climate.copernicus.eu)
+- [Copernicus Atmosphere Data
+  Store](https://ads.atmosphere.copernicus.eu)
+- [Microsoft Planetary
+  Computer](https://planetarycomputer.microsoft.com)
+
+Please note that users must acknowledge the original data sources
+appropriately. Any use of data from these platforms requires clear and
+visible attribution, including proper citation and referencing of the
+datasets, as specified by their licenses and terms of use.
 
 ## Installation
 
@@ -29,7 +37,8 @@ remotes::install_github("jalilian/getsat")
 ## Example 1: Retrieve elevation data
 
 The following example shows how to retrieve elevation data from the
-Copernicus Digital Elevation Model (DEM). You can specify a bounding box
+[Copernicus Digital Elevation Model
+(DEM)](https://doi.org/10.5069/G9028PQB). You can specify a bounding box
 for an area of interest or provide specific coordinates.
 
 ``` r
@@ -54,20 +63,21 @@ elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
 head(elev2)
 #>         X1       X2 elevation
-#> 1 47.41832 34.98238  1878.406
-#> 2 47.46739 34.98555  1857.359
-#> 3 47.22408 34.88596  1739.563
-#> 4 47.03015 34.82099  1756.683
-#> 5 47.36188 34.91549  1626.499
-#> 6 47.42639 34.74900  1731.682
+#> 1 47.26226 34.49864  2100.793
+#> 2 47.03771 34.53155  1335.661
+#> 3 47.12847 34.18226  1715.443
+#> 4 47.46421 34.09917  1612.152
+#> 5 47.25686 34.81869  2334.115
+#> 6 47.04509 34.82563  1959.957
 ```
 
 ## Example 2: Retrieve temprature from MODIS
 
 This example shows how to retrieve 8-day daytime temperature data from
-the Moderate Resolution Imaging Spectroradiometer (MODIS). You can
-specify a bounding box or coordinates, and provide the desired time
-period in the format “YYYY-MM-DD/YYYY-MM-DD”.
+the [Moderate Resolution Imaging Spectroradiometer
+(MODIS)](https://planetarycomputer.microsoft.com/dataset/group/modis).
+You can specify a bounding box or coordinates, and provide the desired
+time period in the format “YYYY-MM-DD/YYYY-MM-DD”.
 
 ``` r
 # Retrieve temperature data for a bounding box (longitude/latitude) and specific time period
