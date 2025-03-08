@@ -1,9 +1,17 @@
 Package: getsat
 Title: Retrieving Commonly Used Satellite Data
 Version: 0.0.2
+Date: 2025-03-08
+Depends: R (>= 4.2.0)
+Maintainer: Abdollah Jalilian <stat4aj@gmail.com>
 Authors@R: 
-    person("Abdollah", "Jalilian", , email = "stat4aj@gmail.com", orcid = "0000-0002-6573-006", role = c("aut", "cre"))
-Description: This R package simplifies access to key satellite data on environmental variables from sources like the Copernicus Atmosphere Monitoring Service, Copernicus Climate Data Store, and Microsoft Planetary Computer. It streamlines data retrieval, processing, and integration, making satellite-based environmental analysis more efficient and accessible.
+    person("Abdollah", "Jalilian", role = c("cre", "aut"),
+    email = "stat4aj@gmail.com", comment=c(orcid = "0000-0002-6573-006"))
+Description: This package provides a simple interface for retrieving commonly 
+    used satellite data on environmental variables from sources such as the 
+    Copernicus Atmosphere Monitoring Service, Copernicus Climate Data Store, 
+    and Microsoft Planetary Computer. It facilitates data retrieval, making 
+    satellite-based environmental analysis more accessible.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -12,5 +20,8 @@ Imports:
     ecmwfr,
     rstac,
     terra
+Suggests:
+    knitr,
+    rmarkdown
 URL: https://github.com/jalilian/getsat
 BugReports: https://github.com/jalilian/getsat/issues
