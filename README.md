@@ -14,17 +14,17 @@ Store - Microsoft Planetary Computer
 
 To install the development version of `getsat` from
 [GitHub](https://github.com/), use the
-[pak](https://CRAN.R-project.org/package=pak) package:
+[remotes](https://CRAN.R-project.org/package=remotes) package:
 
 ``` r
 # Install pak if not already installed
-install.packages("pak")
+install.packages("remotes")
 
 # Install getsat from GitHub
-pak::pak("jalilian/getsat")
+remotes::install_github("jalilian/getsat")
 ```
 
-## Example 1: Retrieve Elevation Data
+## Example 1: Retrieve elevation data
 
 The following example shows how to retrieve elevation data from the
 Copernicus Digital Elevation Model (DEM). You can specify a bounding box
@@ -52,15 +52,15 @@ elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
 head(elev2)
 #>         X1       X2 elevation
-#> 1 47.16671 34.65571  1647.810
-#> 2 47.01319 34.23099  1730.346
-#> 3 47.38901 34.13156  1525.568
-#> 4 47.28066 34.54409  2311.858
-#> 5 47.03034 34.63642  2183.548
-#> 6 47.30659 34.33944  1354.311
+#> 1 47.32860 34.27469  1387.128
+#> 2 47.43353 34.71647  1725.832
+#> 3 47.33100 34.18267  1261.436
+#> 4 47.03997 34.50158  1314.140
+#> 5 47.09230 34.58687  2308.736
+#> 6 47.27749 34.06161  1639.500
 ```
 
-## Example 2: Retrieve Elevation Data
+## Example 2: Retrieve temprature from MODIS
 
 This example shows how to retrieve 8-day daytime temperature data from
 the Moderate Resolution Imaging Spectroradiometer (MODIS). You can
@@ -70,9 +70,9 @@ period in the format “YYYY-MM-DD/YYYY-MM-DD”.
 ``` r
 # Retrieve temperature data for a bounding box (longitude/latitude) and specific time period
 temp <- get_modis(c(47, 34, 47.5, 35), var = "LST_Day_1KM",
-                  datetime = "2024-12-01/2025-01-28")
+                  datetime = "2025-01-01/2025-03-08")
 #> LST_Day_1KM has been found in collection(s): modis-21A2-061
-#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   6%  |                                                                              |=========                                                             |  12%  |                                                                              |=============                                                         |  19%  |                                                                              |==================                                                    |  25%  |                                                                              |======================                                                |  31%  |                                                                              |==========================                                            |  38%  |                                                                              |===============================                                       |  44%  |                                                                              |===================================                                   |  50%  |                                                                              |=======================================                               |  56%  |                                                                              |============================================                          |  62%  |                                                                              |================================================                      |  69%  |                                                                              |====================================================                  |  75%  |                                                                              |=========================================================             |  81%  |                                                                              |=============================================================         |  88%  |                                                                              |==================================================================    |  94%  |                                                                              |======================================================================| 100%
+#>   |                                                                              |                                                                      |   0%  |                                                                              |=====                                                                 |   7%  |                                                                              |==========                                                            |  14%  |                                                                              |===============                                                       |  21%  |                                                                              |====================                                                  |  29%  |                                                                              |=========================                                             |  36%  |                                                                              |==============================                                        |  43%  |                                                                              |===================================                                   |  50%  |                                                                              |========================================                              |  57%  |                                                                              |=============================================                         |  64%  |                                                                              |==================================================                    |  71%  |                                                                              |=======================================================               |  79%  |                                                                              |============================================================          |  86%  |                                                                              |=================================================================     |  93%  |                                                                              |======================================================================| 100%
 # plot retrived temperature data
 terra::plot(temp)
 ```
