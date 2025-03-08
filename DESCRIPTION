@@ -9,9 +9,11 @@ Authors@R:
     email = "stat4aj@gmail.com", comment=c(orcid = "0000-0002-6573-006"))
 Description: This package provides a simple interface for retrieving commonly 
     used satellite data on environmental variables from sources such as the 
-    Copernicus Atmosphere Monitoring Service, Copernicus Climate Data Store, 
-    and Microsoft Planetary Computer. It facilitates data retrieval, making 
-    satellite-based environmental analysis more accessible.
+    Copernicus Climate Data Store (see <https://cds.climate.copernicus.eu>), 
+    Copernicus Atmosphere Data Store (see <https://ads.atmosphere.copernicus.eu/>), 
+    and Microsoft Planetary Computer (see <https://planetarycomputer.microsoft.com/>). 
+    It facilitates data retrieval, making satellite-based environmental analysis 
+    more accessible.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
