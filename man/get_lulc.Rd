@@ -46,6 +46,12 @@ includes 9 LULC classes and is created using a deep learning model trained on
 billions of human-labeled pixels curated by the National Geographic Society.
 }
 \details{
+\strong{Important Note:}
+This dataset is produced by Impact Observatory (processor, producer, licensor),
+Microsoft (host), and Esri (licensor). Users are required to follow the
+license and terms of use specified by Impact Observatory and Esri.
+Failure to do so may violate the data usage policies.
+
 The function first validates the input, including the \code{where} parameter
 (bounding box or coordinates) and the \code{year} parameter. It then uses the Microsoft
 Planetary Computer's STAC API to search and download LULC data tiles, which are

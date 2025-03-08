@@ -4,6 +4,12 @@
 #' Microsoft Planetary Computer. Users can specify a bounding box
 #' or a set of coordinates to retrieve elevation values.
 #'
+#' **Important Note:**
+#' Any use of data provided by the Copernicus program must include proper
+#' citation and acknowledgement of the data sources. Users are required to
+#' follow the license and terms of use specified by Copernicus and European
+#' Space Agency. Failure to do so may violate the data usage policies.
+#'
 #' @param where Either:
 #'   - A numeric vector of length 4 specifying the bounding box
 #'     in longitude/latitude format: \code{c(xmin, ymin, xmax, ymax)}.
@@ -24,7 +30,8 @@
 #' Copernicus DEM: European Space Agency (ESA) and the European Commission.
 #'   Copernicus Digital Elevation Model (Copernicus DEM), distributed by
 #'   the European Space Agency under the Copernicus Programme.
-#'   Available at: https://spacedata.copernicus.eu/
+#'   Available at: https://spacedata.copernicus.eu/ and
+#'   https://doi.org/10.5069/G9028PQB
 #'
 #' Microsoft Planetary Computer: Microsoft AI for Earth.
 #'   Microsoft Planetary Computer. Available at:

@@ -7,10 +7,17 @@
 #' a high spatial resolution of 0.1 degrees (~10 km) and is generated through
 #' an ensemble of eleven air quality forecasting systems combined with
 #' observations from the European Environment Agency (EEA) using data
-#' assimilation techniques. The function returns the processed data as a
-#' `SpatRaster` object for spatial analysis.
+#' assimilation techniques.
+#'
+#' **Important Note:**
+#' Any use of data provided by the Copernicus Atmosphere Data Store must include
+#' proper citation and acknowledgement of the data sources. Users are required to
+#' follow the license and terms of use specified by Copernicus and ECMWF.
+#' Failure to do so may violate the data usage policies.
+#'
 #'
 #' @param key A character string. ECMWF API key associated with your ECMWF account.
+#'
 #' @param vars A character vector specifying air quality variables to retrieve.
 #'   Supported values include:
 #'   - "ammonia" – Ammonia (NH₃)

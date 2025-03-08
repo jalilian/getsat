@@ -58,6 +58,12 @@ It uses the STAC API, processes the retrieved raster data, and optionally
 extracts values for given spatial points.
 }
 \details{
+\strong{Important Note:}
+MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
+and Microsoft (host, processor). Users are required to follow the license and
+terms of use specified by NASA and Microsoft. Failure to do so may violate
+the data usage policies.
+
 This function allows users to retrieve MODIS satellite data for specified
 geographic regions and time periods. MODIS provides various environmental
 datasets, such as land surface temperature, vegetation indices, burned areas,
@@ -104,6 +110,9 @@ or yearly) and is provided in 10° x 10° tiles at the equator.
   print(et_points)
 }
 
+}
+\references{
+Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 }
 \seealso{
 \link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}

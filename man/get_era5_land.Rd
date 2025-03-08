@@ -78,12 +78,19 @@ and extracted files. If \code{NULL} (default), the system's temporary directory
 A \code{SpatRaster} object containing the downloaded air quality data.
 }
 \description{
-This function retrieves ERA5-Land data from the Copernicus Data Store via the ECMWF API.
-ERA5-Land provides a detailed, long-term record of land surface variables from 1950 to the present.
-It is derived from the ERA5 climate reanalysis model, using both model data and observations,
-and adjusted for elevation.
+This function retrieves ERA5-Land data from the Copernicus Data Store via the
+ECMWF API. ERA5-Land provides a detailed, long-term record of land surface
+variables from 1950 to the present. It is derived from the ERA5 climate
+reanalysis model, using both model data and observations, and adjusted for
+elevation.
 }
 \details{
+\strong{Important Note:}
+Any use of data provided by the Copernicus Climate Data Store, including ERA5
+data, must include proper citation and acknowledgement of the data sources.
+Users are required to follow the license and terms of use specified by
+Copernicus and ECMWF. Failure to do so may violate the data usage policies.
+
 This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to
 approximately 2-3 months before the present. The data is processed into a \code{SpatRaster} object for spatial analysis.
 Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.

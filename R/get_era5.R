@@ -1,11 +1,20 @@
 #' Download ERA5-Land Climate Data
 #'
-#' This function retrieves ERA5-Land data from the Copernicus Data Store via the ECMWF API.
-#' ERA5-Land provides a detailed, long-term record of land surface variables from 1950 to the present.
-#' It is derived from the ERA5 climate reanalysis model, using both model data and observations,
-#' and adjusted for elevation.
+#' This function retrieves ERA5-Land data from the Copernicus Data Store via the
+#' ECMWF API. ERA5-Land provides a detailed, long-term record of land surface
+#' variables from 1950 to the present. It is derived from the ERA5 climate
+#' reanalysis model, using both model data and observations, and adjusted for
+#' elevation.
+#'
+#' **Important Note:**
+#' Any use of data provided by the Copernicus Climate Data Store, including ERA5
+#' data, must include proper citation and acknowledgement of the data sources.
+#' Users are required to follow the license and terms of use specified by
+#' Copernicus and ECMWF. Failure to do so may violate the data usage policies.
+#'
 #'
 #' @param key A character string representing the ECMWF API key associated with your user account.
+#'
 #' @param vars A character vector specifying the land surface variables to retrieve. Supported values include:
 #' \itemize{
 #'   \item "2m_dewpoint_temperature", "2m_temperature", "skin_temperature"
@@ -20,19 +29,25 @@
 #'   \item "leaf_area_index_high_vegetation", "leaf_area_index_low_vegetation", "high_vegetation_cover", "low_vegetation_cover"
 #'   \item "lake_total_depth", "land_sea_mask", "soil_type", "type_of_high_vegetation", "type_of_low_vegetation"
 #' }
+#'
 #' @param area A numeric vector of length 4 defining the bounding box for the region of interest,
 #'             in the format `c(North, West, South, East)`. Coordinates must fall within:
 #'             - North: 90.0° N
 #'             - South: -90.0° N
 #'             - West: -180.0° W
 #'             - East: 180.0° W
+#'
 #' @param year A numeric value specifying the year to retrieve data for (from 1950 onwards).
+#'
 #' @param month A numeric or character vector specifying the months to retrieve (default: all months in the year).
 #'              Values are automatically formatted as two-digit strings (e.g., `"01"`, `"02"`).
+#'
 #' @param day A numeric or character vector specifying the days to retrieve (default: all days for the specified months).
 #'            Values are automatically formatted as two-digit strings (e.g., `"01"`, `"02"`).
+#'
 #' @param time A character vector specifying the hours to retrieve (default: all 24 hours of the day).
 #'             The values are automatically formatted as two-digit hour strings (e.g., `"00:00"`, `"01:00"`).
+#'
 #' @param agglevel A character string specifying the temporal aggregation level.
 #'   Options are:
 #'     \itemize{
@@ -50,6 +65,7 @@
 #'       \item `"10days"`
 #'       \item `"15days"`
 #'     }
+#'
 #' @param temp_dir A character string specifying a temporary directory for downloaded
 #'   and extracted files. If `NULL` (default), the system's temporary directory
 #'   (`tempdir()`) is used.

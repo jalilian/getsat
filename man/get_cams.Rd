@@ -95,10 +95,15 @@ from 45.0° W to 25.0° E and latitudes from 30.0° N to 72.0° N. The data has
 a high spatial resolution of 0.1 degrees (~10 km) and is generated through
 an ensemble of eleven air quality forecasting systems combined with
 observations from the European Environment Agency (EEA) using data
-assimilation techniques. The function returns the processed data as a
-\code{SpatRaster} object for spatial analysis.
+assimilation techniques.
 }
 \details{
+\strong{Important Note:}
+Any use of data provided by the Copernicus Atmosphere Data Store must include
+proper citation and acknowledgement of the data sources. Users are required to
+follow the license and terms of use specified by Copernicus and ECMWF.
+Failure to do so may violate the data usage policies.
+
 The function facilitates the automated retrieval of air quality data from the CAMS
 reanalysis database. It performs the following steps:
 \enumerate{

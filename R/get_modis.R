@@ -5,6 +5,12 @@
 #' It uses the STAC API, processes the retrieved raster data, and optionally
 #' extracts values for given spatial points.
 #'
+#' **Important Note:**
+#' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
+#' and Microsoft (host, processor). Users are required to follow the license and
+#' terms of use specified by NASA and Microsoft. Failure to do so may violate
+#' the data usage policies.
+#'
 #' @param where A numeric vector of length 4 representing the bounding box in the
 #'        form c(xmin, ymin, xmax, ymax) or a matrix/data.frame with two columns
 #'      (longitude, latitude) representing points of interest.
@@ -86,6 +92,9 @@
 #'                         datetime = "2023-11-01/2024-02-28")
 #'   print(et_points)
 #' }
+#'
+#' @references
+#' Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 #'
 #' @seealso \link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}
 #'

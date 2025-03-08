@@ -5,6 +5,12 @@
 #' Imaging Spectroradiometer), and returns a data frame containing the collection
 #' `id`, `title`, and available asset variables for each MODIS collection.
 #'
+#' **Important Note:**
+#' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
+#' and Microsoft (host, processor). Users are required to follow the license and
+#' terms of use specified by NASA and Microsoft. Failure to do so may violate
+#' the data usage policies.
+#'
 #' @details
 #' The function uses the `rstac` package to interface with the STAC API provided by
 #' Microsoft's Planetary Computer. It retrieves a list of all collections and filters
@@ -22,6 +28,9 @@
 #'   modis_collections <- check_modis()
 #'   print(modis_collections)
 #' }
+#'
+#' @references
+#' Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 #'
 #' @seealso \link[rstac]{stac}, \link[rstac]{collections}, \link[rstac]{get_request}
 #'

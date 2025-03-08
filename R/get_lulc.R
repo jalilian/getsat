@@ -5,6 +5,12 @@
 #' includes 9 LULC classes and is created using a deep learning model trained on
 #' billions of human-labeled pixels curated by the National Geographic Society.
 #'
+#' **Important Note:**
+#' This dataset is produced by Impact Observatory (processor, producer, licensor),
+#' Microsoft (host), and Esri (licensor). Users are required to follow the
+#' license and terms of use specified by Impact Observatory and Esri.
+#' Failure to do so may violate the data usage policies.
+#'
 #' @param where A numeric vector of length 4 representing the bounding box in the
 #'        form c(xmin, ymin, xmax, ymax) or a matrix/data.frame with two columns
 #'      (longitude, latitude) representing points of interest.
