@@ -7,8 +7,10 @@
 `getsat` is an R package designed to simplify access to commonly used
 satellite data on environmental variables. It provides an easy way to
 retrieve, process, and integrate satellite-based data from sources such
-as: - Copernicus Atmosphere Monitoring Service - Copernicus Climate Data
-Store - Microsoft Planetary Computer
+as: - [Copernicus Climate Data
+Store](https://cds.climate.copernicus.eu) - [Copernicus Atmosphere Data
+Store](https://ads.atmosphere.copernicus.eu) - [Microsoft Planetary
+Computer](https://planetarycomputer.microsoft.com)
 
 ## Installation
 
@@ -52,12 +54,12 @@ elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
 head(elev2)
 #>         X1       X2 elevation
-#> 1 47.32860 34.27469  1387.128
-#> 2 47.43353 34.71647  1725.832
-#> 3 47.33100 34.18267  1261.436
-#> 4 47.03997 34.50158  1314.140
-#> 5 47.09230 34.58687  2308.736
-#> 6 47.27749 34.06161  1639.500
+#> 1 47.41832 34.98238  1878.406
+#> 2 47.46739 34.98555  1857.359
+#> 3 47.22408 34.88596  1739.563
+#> 4 47.03015 34.82099  1756.683
+#> 5 47.36188 34.91549  1626.499
+#> 6 47.42639 34.74900  1731.682
 ```
 
 ## Example 2: Retrieve temprature from MODIS

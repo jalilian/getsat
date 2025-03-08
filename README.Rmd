@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 `getsat` is an R package designed to simplify access to commonly used satellite data on environmental variables. It provides an easy way to retrieve, process, and integrate satellite-based data from sources such as:
-- Copernicus Atmosphere Monitoring Service
-- Copernicus Climate Data Store
-- Microsoft Planetary Computer
+- [Copernicus Climate Data Store](https://cds.climate.copernicus.eu)
+- [Copernicus Atmosphere Data Store](https://ads.atmosphere.copernicus.eu)
+- [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com)
 
 
 ## Installation
