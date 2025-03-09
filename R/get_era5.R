@@ -121,7 +121,7 @@
 #' @export
 get_era5_land <- function(key,
                           vars,
-                          area,
+                          where,
                           year,
                           month = NULL,
                           day = NULL,
