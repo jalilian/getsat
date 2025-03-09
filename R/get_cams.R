@@ -35,14 +35,17 @@
 #'   - "peroxyacyl_nitrates" – Peroxyacyl nitrates (PANs)
 #'   - "sulphur_dioxide" – Sulphur dioxide (SO₂)
 #'
-#' @param where A numeric vector of length 4 specifying the geographical bounding box
-#'   (`c(North, West, South, East)`) or a matrix/data frame with two columns
-#'   (longitude and latitude of points). All coordinates must be in WGS84 format.
-#'   The valid data coverage region is:
-#'   - North: 72.0° N
-#'   - South: 30.0° N
-#'   - West: -45.0° W
-#'   - East: 25.0° W
+#' @param where Either:
+#'   - A numeric vector of length 4 defining the bounding box for the region of
+#'     interest, in the longitude/latitude format `c(North, West, South, East)`.
+#'     Coordinates must be in WGS84 and fall within:
+#'             - North: 72.0° N
+#'             - South: 30.0° N
+#'             - West: -45.0° W
+#'             - East:  25.0° W
+#'   - A matrix or data frame with two columns representing
+#'     longitude (first column) and latitude (second column) of points.
+#'     All coordinates must be in the WGS84 coordinate reference system.
 #'
 #' @param year A numeric value indicating the year for which data is requested.
 #'   Available years range from 2013 to 2023. If the year is 2022 or earlier,
@@ -251,27 +254,22 @@ get_cams <- function(key,
       function(o) terra::tapp(o, index=agglevel, fun="mean")
     )
 
-  # If only one variable, simplify the output
-  if (length(vars) == 1)
-    rdata <- rdata[[1]]
-  else
-    names(rdata) <- vars
 
-  # extract data if 'where' is a matrix
+  # if 'where' is a matrix/data frame, extract elevation values for points
   if (inherits(where, c("matrix", "data.frame")))
   {
     where <- data.frame(where)
-    rdata <- lapply(
-      rdata,
-      function(o) terra::extract(o, where, ID=FALSE)
-    )
-    rdata <- data.frame(where, do.call(cbind, rdata)) %>%
-      pivot_longer(cols = -(1:2),
-                   names_to = c(".value", "time"),
-                   names_pattern = "(.*)_(.*)") %>%
-      mutate(time = gsub("\\.", "-", time)) %>%
-      rename_with(~ sub("\\.d", "", .x))
+    rdata <- lapply(rdata, function(o){
+      out <- terra::extract(o, where, ID=FALSE)
+      data.frame(where, out)
+    })
   }
+
+  # If only one variable, simplify the output
+  if (length(rdata) == 1)
+    rdata <- rdata[[1]]
+  else
+    names(rdata) <- vars
 
   return(rdata)
 }

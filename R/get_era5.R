@@ -328,6 +328,7 @@ get_era5_land <- function(key,
     })
   }
 
+  # If only one variable, simplify the output
   if (length(rdata) == 1)
     rdata <- rdata[[1]]
 
