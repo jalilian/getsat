@@ -42,15 +42,18 @@ Supported values include:
 \item "sulphur_dioxide" – Sulphur dioxide (SO₂)
 }}
 
-\item{where}{A numeric vector of length 4 specifying the geographical bounding box
-(\code{c(North, West, South, East)}) or a matrix/data frame with two columns
-(longitude and latitude of points). All coordinates must be in WGS84 format.
-The valid data coverage region is:
+\item{where}{Either:
 \itemize{
-\item North: 72.0° N
-\item South: 30.0° N
-\item West: -45.0° W
-\item East: 25.0° W
+\item A numeric vector of length 4 defining the bounding box for the region of
+interest, in the longitude/latitude format \code{c(North, West, South, East)}.
+Coordinates must be in WGS84 and fall within:
+- North: 72.0° N
+- South: 30.0° N
+- West: -45.0° W
+- East:  25.0° W
+\item A matrix or data frame with two columns representing
+longitude (first column) and latitude (second column) of points.
+All coordinates must be in the WGS84 coordinate reference system.
 }}
 
 \item{year}{A numeric value indicating the year for which data is requested.
@@ -125,10 +128,16 @@ area <- c(47.1, 6.6, 35.4, 18.6)
 key <- "********************************"
 
 # Download ozone concentration data for March 2021
-oz <- get_cams(key, vars = "ozone", year = 2021, month = 3, where = area)
+oz1 <- get_cams(key, vars = "ozone", year = 2021, month = 3, where = area)
 
 # Plot the retrieved data
-plot(oz)
+plot(oz1)
+
+# Download ozone and  Nitrogen dioxide data for March 2021
+oz2 <- get_cams(key, vars = c("ozone", "nitrogen_dioxide"),
+                where = cbind(runif(100, 6, 18), runif(100, 36, 47)),
+                year = 2021, month = 3)
+print(st2)
 }
 
 }

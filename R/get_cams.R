@@ -100,10 +100,16 @@
 #' key <- "********************************"
 #'
 #' # Download ozone concentration data for March 2021
-#' oz <- get_cams(key, vars = "ozone", year = 2021, month = 3, where = area)
+#' oz1 <- get_cams(key, vars = "ozone", year = 2021, month = 3, where = area)
 #'
 #' # Plot the retrieved data
-#' plot(oz)
+#' plot(oz1)
+#'
+#' # Download ozone and  Nitrogen dioxide data for March 2021
+#' oz2 <- get_cams(key, vars = c("ozone", "nitrogen_dioxide"),
+#'                 where = cbind(runif(100, 6, 18), runif(100, 36, 47)),
+#'                 year = 2021, month = 3)
+#' print(st2)
 #' }
 #'
 #' @seealso \link[terra]{rast}, \link[ecmwfr]{wf_set_key}, \link[ecmwfr]{wf_request}
