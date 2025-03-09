@@ -229,7 +229,7 @@ get_cams <- function(key,
     user = user,
     request = request,
     transfer = TRUE,
-    path = getwd(),
+    path = temp_dir,
     time_out = 3 * 60 * 60,
     verbose = TRUE
   )

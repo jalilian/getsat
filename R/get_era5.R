@@ -251,7 +251,7 @@ get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
     user = user,
     request = request,
     transfer = TRUE,
-    path = getwd(),
+    path = temp_dir,
     time_out = 3 * 60 * 60,
     verbose = TRUE
   )
