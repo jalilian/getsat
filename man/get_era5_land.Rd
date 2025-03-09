@@ -7,7 +7,7 @@
 get_era5_land(
   key,
   vars,
-  area,
+  where,
   year,
   month = NULL,
   day = NULL,
@@ -34,12 +34,19 @@ get_era5_land(
 \item "lake_total_depth", "land_sea_mask", "soil_type", "type_of_high_vegetation", "type_of_low_vegetation"
 }}
 
-\item{area}{A numeric vector of length 4 defining the bounding box for the region of interest,
-in the format \code{c(North, West, South, East)}. Coordinates must fall within:
+\item{where}{Either:
+\itemize{
+\item A numeric vector of length 4 defining the bounding box for the region of
+interest, in the longitude/latitude format \code{c(North, West, South, East)}.
+Coordinates must fall within:
 - North: 90.0° N
 - South: -90.0° N
 - West: -180.0° W
-- East: 180.0° W}
+- East: 180.0° W
+\item A matrix or data frame with two columns representing
+longitude (first column) and latitude (second column) of points.
+All coordinates must be in the WGS84 coordinate reference system.
+}}
 
 \item{year}{A numeric value specifying the year to retrieve data for (from 1950 onwards).}
 
@@ -75,7 +82,10 @@ and extracted files. If \code{NULL} (default), the system's temporary directory
 (\code{tempdir()}) is used.}
 }
 \value{
-A \code{SpatRaster} object containing the downloaded air quality data.
+If \code{where} is a bounding box (numeric vector of length four),
+returns a list of \code{SpatRaster} object representing the data on selected variables.
+If \code{where} is a matrix or data frame, returns a list of \code{data.frame} with
+coordinates and the values of selected variables.
 }
 \description{
 This function retrieves ERA5-Land data from the Copernicus Data Store via the
@@ -87,9 +97,11 @@ Copernicus and ECMWF. Failure to comply may result in data usage policy
 violations.
 }
 \details{
-This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to
-approximately 2-3 months before the present. The data is processed into a \code{SpatRaster} object for spatial analysis.
-Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.
+This function retrieves data from the ERA5-Land dataset, which
+covers the period from January 1950 to approximately 2-3 months before the
+present. The data is processed into a list of \code{SpatRaster} or \code{data.frame}
+objects for spatial analysis. Temporal aggregation (e.g., by months or years)
+can be performed after retrieval if needed.
 
 \strong{Important Note:}
 Any use of data provided by the Copernicus Climate Data Store, including ERA5
@@ -106,11 +118,17 @@ area <- c(47.1, 6.6, 35.4, 18.6)
 key <- "********************************"
 
 # Download skin temperature data for 6th of October 2022
-st <- get_era5_land(key, vars = "skin_temperature", area = area,
+st1 <- get_era5_land(key, vars = "skin_temperature", where = area,
                     year = 2022, month = 10, day=6)
 
 # Plot the retrieved data
-plot(st)
+plot(st1)
+
+# Download skin and 2 meter temperature data for 6th and 7th of October 2022
+st2 <- get_era5_land(key, vars = c("skin_temperature", "2m_temperature"),
+                     where = cbind(runif(100, 6, 18), runif(100, 36, 47)),
+                     year = 2022, month = 10, day=6:7)
+print(st2)
 }
 
 }
