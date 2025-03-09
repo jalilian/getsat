@@ -44,14 +44,11 @@ This function retrieves global land use and land cover (LULC) maps derived from
 ESA Sentinel-2 imagery at a 10m resolution for the years 2017-2023. The dataset
 includes 9 LULC classes and is created using a deep learning model trained on
 billions of human-labeled pixels curated by the National Geographic Society.
+Please follow the license and terms of use from Impact Observatory (processor,
+producer, licensor), Microsoft (host), and Esri (licensor). Failure to comply
+may result in data usage policy violations.
 }
 \details{
-\strong{Important Note:}
-This dataset is produced by Impact Observatory (processor, producer, licensor),
-Microsoft (host), and Esri (licensor). Users are required to follow the
-license and terms of use specified by Impact Observatory and Esri.
-Failure to do so may violate the data usage policies.
-
 The function first validates the input, including the \code{where} parameter
 (bounding box or coordinates) and the \code{year} parameter. It then uses the Microsoft
 Planetary Computer's STAC API to search and download LULC data tiles, which are
@@ -71,6 +68,12 @@ The LULC classes are represented by integer values:
 \item 10: Clouds
 \item 11: Rangeland
 }
+
+\strong{Important Note:}
+This dataset is produced by Impact Observatory (processor, producer, licensor),
+Microsoft (host), and Esri (licensor). Users are required to follow the
+license and terms of use specified by Impact Observatory and Esri.
+Failure to do so may violate the data usage policies.
 }
 \examples{
 \dontrun{
@@ -84,8 +87,13 @@ lulc_data <- get_lulc(coordinates, year = 2023, fact = 2)
 
 }
 \references{
-Impact Observatory, Microsoft, and Esri. (2023). Global Land Use Land Cover (LULC) Dataset, 10m Resolution (2017-2023).
-ESA Sentinel-2 Imagery. Available at: https://planetarycomputer.microsoft.com/
+-Impact Observatory, Microsoft, and Esri. (2023). Global Land Use Land Cover (LULC) Dataset, 10m Resolution (2017-2023).
+\itemize{
+\item ESA Sentinel-2 Imagery. Available at: https://planetarycomputer.microsoft.com/
+}
+}
+\seealso{
+\link[terra]{rast}, \link[terra]{focal}
 }
 \author{
 Abdollah Jalilian

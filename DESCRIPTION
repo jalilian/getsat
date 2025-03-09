@@ -7,13 +7,15 @@ Maintainer: Abdollah Jalilian <stat4aj@gmail.com>
 Authors@R: 
     person("Abdollah", "Jalilian", role = c("cre", "aut"),
     email = "stat4aj@gmail.com", comment=c(orcid = "0000-0002-6573-006"))
-Description: This package provides a simple interface for retrieving commonly 
-    used satellite data on environmental variables from sources such as the 
-    Copernicus Climate Data Store (see <https://cds.climate.copernicus.eu>), 
+Description: This package simplifies access to environmental satellite data from 
+    sources like the Copernicus Climate Data Store (see <https://cds.climate.copernicus.eu>), 
     Copernicus Atmosphere Data Store (see <https://ads.atmosphere.copernicus.eu/>), 
     and Microsoft Planetary Computer (see <https://planetarycomputer.microsoft.com/>). 
-    It facilitates data retrieval, making satellite-based environmental analysis 
-    more accessible.
+    Users must properly acknowledge all data sources by properly citing and 
+    referencing datasets according to their licenses and terms of use. Development 
+    of this package was supported by the Lancaster Ecology and Epidemiology Group (LEEG) 
+    and funded by Biotechnology and Biological Sciences Research Council (BB/Y514238/1) 
+    and the Wellcome Trust (220870/Z/20/Z).
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

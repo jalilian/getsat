@@ -4,14 +4,9 @@
 #' ECMWF API. ERA5-Land provides a detailed, long-term record of land surface
 #' variables from 1950 to the present. It is derived from the ERA5 climate
 #' reanalysis model, using both model data and observations, and adjusted for
-#' elevation.
-#'
-#' **Important Note:**
-#' Any use of data provided by the Copernicus Climate Data Store, including ERA5
-#' data, must include proper citation and acknowledgement of the data sources.
-#' Users are required to follow the license and terms of use specified by
-#' Copernicus and ECMWF. Failure to do so may violate the data usage policies.
-#'
+#' elevation. Please follow the license and terms of use from
+#' Copernicus and ECMWF. Failure to comply may result in data usage policy
+#' violations.
 #'
 #' @param key A character string representing the ECMWF API key associated with your user account.
 #'
@@ -76,6 +71,12 @@
 #'          approximately 2-3 months before the present. The data is processed into a `SpatRaster` object for spatial analysis.
 #'          Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.
 #'
+#' **Important Note:**
+#' Any use of data provided by the Copernicus Climate Data Store, including ERA5
+#' data, must include proper citation and acknowledgement of the data sources.
+#' Users are required to follow the license and terms of use specified by
+#' Copernicus and ECMWF. Failure to do so may violate the data usage policies.
+#'
 #' @examples
 #' \dontrun{
 #' # Define the geographical area (North, West, South, East)
@@ -92,9 +93,12 @@
 #' plot(st)
 #' }
 #'
+#' @seealso \link[terra]{rast}, \link[ecmwfr]{wf_set_key}, \link[ecmwfr]{wf_request}
+#'
 #' @references
-#' Copernicus Climate Data Store: https://cds.climate.copernicus.eu/
-#' ECMWF API Documentation: https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5
+#' - Copyright and licences: http://www.copernicus.eu/en/access-data/copyright-and-licences and https://www.ecmwf.int/en/terms-use
+#' - Copernicus Climate Data Store: https://cds.climate.copernicus.eu/
+#' - ECMWF API Documentation: https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5
 #'
 #' @author Abdollah Jalilian
 #'
@@ -102,6 +106,8 @@
 get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
                           time = NULL, agglevel="days", temp_dir = NULL)
 {
+  message("For citation and terms of use, see\n<https://cds.climate.copernicus.eu>\n<https://www.ecmwf.int/>")
+
   # ERA5-Land climate variables
   c_vars <- c(
     "2m_dewpoint_temperature", # Dew point temperature at 2 meters above the surface (K)
@@ -204,7 +210,7 @@ get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
 
   # set ECMWF authentication
   user <- "ecmwfr"
-  wf_set_key(key = key, user = user)
+  ecmwfr::wf_set_key(key = key, user = user)
 
   # create a temporary directory to downloaded and extract files
   if (is.null(temp_dir))
@@ -238,10 +244,10 @@ get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
   )
 
   # Validate request and credentials
-  wf_check_request(request = request)
+  ecmwfr::wf_check_request(request = request)
 
   # Download data
-  out_file <- wf_request(
+  out_file <- ecmwfr::wf_request(
     user = user,
     request = request,
     transfer = TRUE,

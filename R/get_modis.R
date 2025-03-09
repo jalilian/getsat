@@ -1,15 +1,11 @@
-#' Retrive MODIS Data
+#' Retrieve MODIS Data
 #'
 #' Access and download the Moderate Resolution Imaging Spectroradiometer (MODIS)
 #' satellite data, available through the Microsoft's Planetary Computer STAC API.
 #' It uses the STAC API, processes the retrieved raster data, and optionally
-#' extracts values for given spatial points.
-#'
-#' **Important Note:**
-#' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
-#' and Microsoft (host, processor). Users are required to follow the license and
-#' terms of use specified by NASA and Microsoft. Failure to do so may violate
-#' the data usage policies.
+#' extracts values for given spatial points. Please follow the license and terms
+#' of use from NASA and Microsoft. Failure to comply may result in data usage
+#' policy violations.
 #'
 #' @param where A numeric vector of length 4 representing the bounding box in the
 #'        form c(xmin, ymin, xmax, ymax) or a matrix/data.frame with two columns
@@ -53,6 +49,12 @@
 #' and primary productivity. The following table provides information on available
 #' MODIS collections and their corresponding variables:
 #'
+#' **Important Note:**
+#' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
+#' and Microsoft (host, processor). Users are required to follow the license and
+#' terms of use specified by NASA and Microsoft. Failure to do so may violate
+#' the data usage policies.
+#'
 #' \tabular{lll}{
 #'   \strong{id} \tab \strong{title} \tab \strong{vars} \cr
 #'   modis-64A1-061 \tab MODIS Burned Area Monthly \tab QA, hdf, Last_Day, metadata, Burn_Date, First_Day, Burn_Date_Uncertainty \cr
@@ -93,10 +95,12 @@
 #'   print(et_points)
 #' }
 #'
-#' @references
-#' Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
+#' @seealso \link[terra]{rast}, \link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}
 #'
-#' @seealso \link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}
+#' @references
+#' - Data Use Guidelines for NASA Terra and Aqua MODIS, Suomi NPP, and other Collections.
+#' - Avilable at https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf
+#' - Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 #'
 #' @author Abdollah Jalilian
 #'
@@ -111,6 +115,9 @@ get_modis <- function(where,
                       output_dir=tempdir(),
                       clean_dir=FALSE)
 {
+  message("See 'Data Use Guidelines for NASA Terra and Aqua MODIS, Suomi NPP, and other Collections.'\n",
+          "- Available at <https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf>")
+
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
   {

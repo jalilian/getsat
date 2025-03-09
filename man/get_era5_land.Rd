@@ -82,18 +82,20 @@ This function retrieves ERA5-Land data from the Copernicus Data Store via the
 ECMWF API. ERA5-Land provides a detailed, long-term record of land surface
 variables from 1950 to the present. It is derived from the ERA5 climate
 reanalysis model, using both model data and observations, and adjusted for
-elevation.
+elevation. Please follow the license and terms of use from
+Copernicus and ECMWF. Failure to comply may result in data usage policy
+violations.
 }
 \details{
+This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to
+approximately 2-3 months before the present. The data is processed into a \code{SpatRaster} object for spatial analysis.
+Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.
+
 \strong{Important Note:}
 Any use of data provided by the Copernicus Climate Data Store, including ERA5
 data, must include proper citation and acknowledgement of the data sources.
 Users are required to follow the license and terms of use specified by
 Copernicus and ECMWF. Failure to do so may violate the data usage policies.
-
-This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to
-approximately 2-3 months before the present. The data is processed into a \code{SpatRaster} object for spatial analysis.
-Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.
 }
 \examples{
 \dontrun{
@@ -113,8 +115,14 @@ plot(st)
 
 }
 \references{
-Copernicus Climate Data Store: https://cds.climate.copernicus.eu/
-ECMWF API Documentation: https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5
+\itemize{
+\item Copyright and licences: http://www.copernicus.eu/en/access-data/copyright-and-licences and https://www.ecmwf.int/en/terms-use
+\item Copernicus Climate Data Store: https://cds.climate.copernicus.eu/
+\item ECMWF API Documentation: https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5
+}
+}
+\seealso{
+\link[terra]{rast}, \link[ecmwfr]{wf_set_key}, \link[ecmwfr]{wf_request}
 }
 \author{
 Abdollah Jalilian

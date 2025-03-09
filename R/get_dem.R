@@ -4,12 +4,6 @@
 #' Microsoft Planetary Computer. Users can specify a bounding box
 #' or a set of coordinates to retrieve elevation values.
 #'
-#' **Important Note:**
-#' Any use of data provided by the Copernicus program must include proper
-#' citation and acknowledgement of the data sources. Users are required to
-#' follow the license and terms of use specified by Copernicus and European
-#' Space Agency. Failure to do so may violate the data usage policies.
-#'
 #' @param where Either:
 #'   - A numeric vector of length 4 specifying the bounding box
 #'     in longitude/latitude format: \code{c(xmin, ymin, xmax, ymax)}.
@@ -26,16 +20,21 @@
 #'   If `where` is a matrix or data frame, returns a `data.frame` with
 #'   coordinates and their corresponding DEM values.
 #'
-#' @references
-#' Copernicus DEM: European Space Agency (ESA) and the European Commission.
-#'   Copernicus Digital Elevation Model (Copernicus DEM), distributed by
-#'   the European Space Agency under the Copernicus Programme.
-#'   Available at: https://spacedata.copernicus.eu/ and
-#'   https://doi.org/10.5069/G9028PQB
+#' @details
+#' **Important Note:**
+#' Any use of data provided by the Copernicus program must include proper
+#' citation and acknowledgement of the data sources. Users are required to
+#' follow the license and terms of use specified by Copernicus and European
+#' Space Agency. Failure to do so may violate the data usage policies.
 #'
-#' Microsoft Planetary Computer: Microsoft AI for Earth.
-#'   Microsoft Planetary Computer. Available at:
-#'   https://planetarycomputer.microsoft.com/
+#' @references
+#' - Copernicus DEM: European Space Agency (ESA) and the European Commission.
+#'    + Copernicus Digital Elevation Model (Copernicus DEM), distributed by the European Space Agency under the Copernicus Programme.
+#'    + Available at: https://spacedata.copernicus.eu/ and https://doi.org/10.5069/G9028PQB
+#'
+#' - Microsoft Planetary Computer: Microsoft AI for Earth.
+#'    + Microsoft Planetary Computer.
+#'    + Available at: https://planetarycomputer.microsoft.com/
 #'
 #' @examples
 #' \dontrun{
@@ -49,6 +48,8 @@
 #'   print(dem_points)
 #' }
 #'
+#' @seealso \link[terra]{rast}
+#'
 #' @author Abdollah Jalilian
 #'
 #' @export
@@ -56,6 +57,8 @@ get_dem <- function(where,
                     res=30,
                     output_dir=tempdir())
 {
+  message("For citation and terms of use, see\n<https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM>")
+
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
   {

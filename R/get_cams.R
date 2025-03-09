@@ -7,14 +7,9 @@
 #' a high spatial resolution of 0.1 degrees (~10 km) and is generated through
 #' an ensemble of eleven air quality forecasting systems combined with
 #' observations from the European Environment Agency (EEA) using data
-#' assimilation techniques.
-#'
-#' **Important Note:**
-#' Any use of data provided by the Copernicus Atmosphere Data Store must include
-#' proper citation and acknowledgement of the data sources. Users are required to
-#' follow the license and terms of use specified by Copernicus and ECMWF.
-#' Failure to do so may violate the data usage policies.
-#'
+#' assimilation techniques. Please follow the license and terms of use from
+#' Copernicus and ECMWF. Failure to comply may result in data usage policy
+#' violations.
 #'
 #' @param key A character string. ECMWF API key associated with your ECMWF account.
 #'
@@ -87,6 +82,12 @@
 #' 4. Downloads data in ZIP format.
 #' 5. Extracts the ZIP archive and loads the data as a `SpatRaster` object.
 #'
+#' **Important Note:**
+#' Any use of data provided by the Copernicus Atmosphere Data Store must include
+#' proper citation and acknowledgement of the data sources. Users are required to
+#' follow the license and terms of use specified by Copernicus and ECMWF.
+#' Failure to do so may violate the data usage policies.
+#'
 #' @examples
 #' \dontrun{
 #' # Define geographical area (North, West, South, East)
@@ -102,8 +103,12 @@
 #' plot(oz)
 #' }
 #'
+#' @seealso \link[terra]{rast}, \link[ecmwfr]{wf_set_key}, \link[ecmwfr]{wf_request}
+#'
 #' @author Abdollah Jalilian
+#'
 #' @references
+#' - Copyright and licences: http://www.copernicus.eu/en/access-data/copyright-and-licences and https://www.ecmwf.int/en/terms-use
 #' - Copernicus Atmosphere Monitoring Service (CAMS): https://atmosphere.copernicus.eu/
 #' - ECMWF API Documentation: https://confluence.ecmwf.int/display/WEBAPI/Access+ECMWF+Public+Datasets
 #' @export
@@ -116,6 +121,8 @@ get_cams <- function(key,
                      agglevel="days",
                      temp_dir = NULL)
 {
+  message("For citation and terms of use, see\n<https://ads.atmosphere.copernicus.eu>\n<https://www.ecmwf.int/>")
+
   # air quality variables
   aq_vars <- c(
     "ammonia", # Ammonia
@@ -178,7 +185,7 @@ get_cams <- function(key,
 
   # set ECMWF authentication
   user <- "ecmwfr"
-  wf_set_key(key = key, user = user)
+  ecmwfr::wf_set_key(key = key, user = user)
 
   # create a temporary directory to downloaded and extract files
   if (is.null(temp_dir))
@@ -215,10 +222,10 @@ get_cams <- function(key,
   )
 
   # Validate request and credentials
-  wf_check_request(request = request)
+  ecmwfr::wf_check_request(request = request)
 
   # Download data
-  out_file <- wf_request(
+  out_file <- ecmwfr::wf_request(
     user = user,
     request = request,
     transfer = TRUE,

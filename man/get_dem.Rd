@@ -54,15 +54,21 @@ Space Agency. Failure to do so may violate the data usage policies.
 
 }
 \references{
-Copernicus DEM: European Space Agency (ESA) and the European Commission.
-Copernicus Digital Elevation Model (Copernicus DEM), distributed by
-the European Space Agency under the Copernicus Programme.
-Available at: https://spacedata.copernicus.eu/ and
-https://doi.org/10.5069/G9028PQB
-
-Microsoft Planetary Computer: Microsoft AI for Earth.
-Microsoft Planetary Computer. Available at:
-https://planetarycomputer.microsoft.com/
+\itemize{
+\item Copernicus DEM: European Space Agency (ESA) and the European Commission.
+\itemize{
+\item Copernicus Digital Elevation Model (Copernicus DEM), distributed by the European Space Agency under the Copernicus Programme.
+\item Available at: https://spacedata.copernicus.eu/ and https://doi.org/10.5069/G9028PQB
+}
+\item Microsoft Planetary Computer: Microsoft AI for Earth.
+\itemize{
+\item Microsoft Planetary Computer.
+\item Available at: https://planetarycomputer.microsoft.com/
+}
+}
+}
+\seealso{
+\link[terra]{rast}
 }
 \author{
 Abdollah Jalilian

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_modis.R
 \name{get_modis}
 \alias{get_modis}
-\title{Retrive MODIS Data}
+\title{Retrieve MODIS Data}
 \usage{
 get_modis(
   where,
@@ -55,20 +55,22 @@ Default is a temporary directory.}
 Access and download the Moderate Resolution Imaging Spectroradiometer (MODIS)
 satellite data, available through the Microsoft's Planetary Computer STAC API.
 It uses the STAC API, processes the retrieved raster data, and optionally
-extracts values for given spatial points.
+extracts values for given spatial points. Please follow the license and terms
+of use from NASA and Microsoft. Failure to comply may result in data usage
+policy violations.
 }
 \details{
-\strong{Important Note:}
-MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
-and Microsoft (host, processor). Users are required to follow the license and
-terms of use specified by NASA and Microsoft. Failure to do so may violate
-the data usage policies.
-
 This function allows users to retrieve MODIS satellite data for specified
 geographic regions and time periods. MODIS provides various environmental
 datasets, such as land surface temperature, vegetation indices, burned areas,
 and primary productivity. The following table provides information on available
 MODIS collections and their corresponding variables:
+
+\strong{Important Note:}
+MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
+and Microsoft (host, processor). Users are required to follow the license and
+terms of use specified by NASA and Microsoft. Failure to do so may violate
+the data usage policies.
 
 \tabular{lll}{
 \strong{id} \tab \strong{title} \tab \strong{vars} \cr
@@ -112,10 +114,14 @@ or yearly) and is provided in 10° x 10° tiles at the equator.
 
 }
 \references{
-Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
+\itemize{
+\item Data Use Guidelines for NASA Terra and Aqua MODIS, Suomi NPP, and other Collections.
+\item Avilable at https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf
+\item Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
+}
 }
 \seealso{
-\link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}
+\link[terra]{rast}, \link[terra]{aggregate}, \link[terra]{focal}, \link[getsat]{check_modis}
 }
 \author{
 Abdollah Jalilian

@@ -16,19 +16,21 @@ A data frame with the following columns:
 This function connects to the Microsoft Planetary Computer's STAC API, retrieves
 all available collections, filters the ones related to MODIS (Moderate Resolution
 Imaging Spectroradiometer), and returns a data frame containing the collection
-\code{id}, \code{title}, and available asset variables for each MODIS collection.
+\code{id}, \code{title}, and available asset variables for each MODIS collection. Please
+follow the license and terms of use from NASA and Microsoft. Failure to comply
+may result in data usage policy violations.
 }
 \details{
+The function uses the \code{rstac} package to interface with the STAC API provided by
+Microsoft's Planetary Computer. It retrieves a list of all collections and filters
+those whose \code{id} starts with "modis". It then returns a data frame containing
+the \code{id}, \code{title}, and asset variable names of the filtered collections.
+
 \strong{Important Note:}
 MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
 and Microsoft (host, processor). Users are required to follow the license and
 terms of use specified by NASA and Microsoft. Failure to do so may violate
 the data usage policies.
-
-The function uses the \code{rstac} package to interface with the STAC API provided by
-Microsoft's Planetary Computer. It retrieves a list of all collections and filters
-those whose \code{id} starts with "modis". It then returns a data frame containing
-the \code{id}, \code{title}, and asset variable names of the filtered collections.
 }
 \examples{
 \dontrun{
@@ -39,6 +41,9 @@ the \code{id}, \code{title}, and asset variable names of the filtered collection
 
 }
 \references{
+Data Use Guidelines for NASA Terra and Aqua MODIS, Suomi NPP, and other Collections.
+Avilable at https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf
+
 Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 }
 \seealso{

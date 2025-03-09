@@ -4,12 +4,9 @@
 #' ESA Sentinel-2 imagery at a 10m resolution for the years 2017-2023. The dataset
 #' includes 9 LULC classes and is created using a deep learning model trained on
 #' billions of human-labeled pixels curated by the National Geographic Society.
-#'
-#' **Important Note:**
-#' This dataset is produced by Impact Observatory (processor, producer, licensor),
-#' Microsoft (host), and Esri (licensor). Users are required to follow the
-#' license and terms of use specified by Impact Observatory and Esri.
-#' Failure to do so may violate the data usage policies.
+#' Please follow the license and terms of use from Impact Observatory (processor,
+#' producer, licensor), Microsoft (host), and Esri (licensor). Failure to comply
+#' may result in data usage policy violations.
 #'
 #' @param where A numeric vector of length 4 representing the bounding box in the
 #'        form c(xmin, ymin, xmax, ymax) or a matrix/data.frame with two columns
@@ -49,6 +46,12 @@
 #' - 10: Clouds
 #' - 11: Rangeland
 #'
+#' **Important Note:**
+#' This dataset is produced by Impact Observatory (processor, producer, licensor),
+#' Microsoft (host), and Esri (licensor). Users are required to follow the
+#' license and terms of use specified by Impact Observatory and Esri.
+#' Failure to do so may violate the data usage policies.
+#'
 #' @examples
 #' \dontrun{
 #' # Retrieve LULC for a bounding box in 2023 and include class labels
@@ -59,9 +62,11 @@
 #' lulc_data <- get_lulc(coordinates, year = 2023, fact = 2)
 #' }
 #'
+#' @seealso \link[terra]{rast}, \link[terra]{focal}
+#'
 #' @references
-#' Impact Observatory, Microsoft, and Esri. (2023). Global Land Use Land Cover (LULC) Dataset, 10m Resolution (2017-2023).
-#' ESA Sentinel-2 Imagery. Available at: https://planetarycomputer.microsoft.com/
+#' -Impact Observatory, Microsoft, and Esri. (2023). Global Land Use Land Cover (LULC) Dataset, 10m Resolution (2017-2023).
+#' - ESA Sentinel-2 Imagery. Available at: https://planetarycomputer.microsoft.com/
 #'
 #' @author Abdollah Jalilian
 #'
@@ -71,6 +76,8 @@ get_lulc <- function(where, year=2023,
                      output_dir=tempdir(),
                      clean_dir=FALSE)
 {
+  message("For citation and terms of use, see\n<https://planetarycomputer.microsoft.com/dataset/io-lulc-annual-v02>")
+
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
   {
