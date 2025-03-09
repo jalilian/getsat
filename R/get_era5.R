@@ -25,12 +25,17 @@
 #'   \item "lake_total_depth", "land_sea_mask", "soil_type", "type_of_high_vegetation", "type_of_low_vegetation"
 #' }
 #'
-#' @param area A numeric vector of length 4 defining the bounding box for the region of interest,
-#'             in the format `c(North, West, South, East)`. Coordinates must fall within:
+#' @param where Either:
+#'   - A numeric vector of length 4 defining the bounding box for the region of
+#'     interest, in the longitude/latitude format `c(North, West, South, East)`.
+#'     Coordinates must fall within:
 #'             - North: 90.0° N
 #'             - South: -90.0° N
 #'             - West: -180.0° W
 #'             - East: 180.0° W
+#'   - A matrix or data frame with two columns representing
+#'     longitude (first column) and latitude (second column) of points.
+#'     All coordinates must be in the WGS84 coordinate reference system.
 #'
 #' @param year A numeric value specifying the year to retrieve data for (from 1950 onwards).
 #'
@@ -65,11 +70,17 @@
 #'   and extracted files. If `NULL` (default), the system's temporary directory
 #'   (`tempdir()`) is used.
 #'
-#' @return A `SpatRaster` object containing the downloaded air quality data.
+#' @return If `where` is a bounding box (numeric vector of length four),
+#'   returns a list of `SpatRaster` object representing the data on selected variables.
+#'   If `where` is a matrix or data frame, returns a list of `data.frame` with
+#'   coordinates and the values of selected variables.
 #'
-#' @details This function retrieves data from the ERA5-Land dataset, which covers the period from January 1950 to
-#'          approximately 2-3 months before the present. The data is processed into a `SpatRaster` object for spatial analysis.
-#'          Temporal aggregation (e.g., by months or years) can be performed after retrieval if needed.
+#'
+#' @details This function retrieves data from the ERA5-Land dataset, which
+#'    covers the period from January 1950 to approximately 2-3 months before the
+#'    present. The data is processed into a list of `SpatRaster` or `data.frame`
+#'    objects for spatial analysis. Temporal aggregation (e.g., by months or years)
+#'    can be performed after retrieval if needed.
 #'
 #' **Important Note:**
 #' Any use of data provided by the Copernicus Climate Data Store, including ERA5
@@ -86,11 +97,16 @@
 #' key <- "********************************"
 #'
 #' # Download skin temperature data for 6th of October 2022
-#' st <- get_era5_land(key, vars = "skin_temperature", area = area,
+#' st1 <- get_era5_land(key, vars = "skin_temperature", where = area,
 #'                     year = 2022, month = 10, day=6)
 #'
 #' # Plot the retrieved data
-#' plot(st)
+#' plot(st1)
+#'
+#' # Download skin and 2 meter temperature data for 6th and 7th of October 2022
+#' st2 <- get_era5_land(key, vars = c("skin_temperature", "2m_temperature"),
+#'                      where = cbind(runif(100, 6, 18), runif(100, 36, 47)),
+#'                      year = 2022, month = 10, day=6:7)
 #' }
 #'
 #' @seealso \link[terra]{rast}, \link[ecmwfr]{wf_set_key}, \link[ecmwfr]{wf_request}
@@ -103,8 +119,15 @@
 #' @author Abdollah Jalilian
 #'
 #' @export
-get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
-                          time = NULL, agglevel="days", temp_dir = NULL)
+get_era5_land <- function(key,
+                          vars,
+                          area,
+                          year,
+                          month = NULL,
+                          day = NULL,
+                          time = NULL,
+                          agglevel="days",
+                          temp_dir = NULL)
 {
   message("For citation and terms of use, see\n<https://cds.climate.copernicus.eu>\n<https://www.ecmwf.int/>")
 
@@ -176,6 +199,24 @@ get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
     stop("Invalid value(s) in 'vars'. Allowed values are: ",
          paste(c_vars, collapse = ", "))
 
+  # validate where: area or coordinate matrix/data frame
+  if (is.numeric(where) && length(where) == 4)
+  {
+    area <- where
+  } else if (inherits(where, c("matrix", "data.frame")) && ncol(where) == 2)
+  {
+    area <- c(
+      max(where[, 2]) + 0.15, min(where[, 1]) - 0.15,
+      max(where[, 2]) - 0.15, max(where[, 2]) + 0.15
+    )
+  } else {
+    stop("'where' must be a numeric vector of length 4 (area) or a matrix/data.frame with two columns (longitude, latitude).")
+  }
+
+  # validate bounding box format
+  if (area[1] >= area[3] || area[4] >= area[2])
+    stop("Bounding box must be in the format c(North, West, South, East) with valid coordinates.")
+
   # validate the year
   if (any(year < 1940))
     stop("Data is only available form January 1940")
@@ -221,7 +262,7 @@ get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
   }
 
   # Define output filename
-  dfile <- paste0("cams_hourly_", year, "_", month, ".zip")
+  dfile <- paste0("era5_hourly_", year, "_", month, ".zip")
 
   # request for getting data
   request <- list(
@@ -259,11 +300,35 @@ get_era5_land <- function(key, vars, area, year, month = NULL, day = NULL,
   # create a SpatRaster object from the downloaded data file
   rdata <- terra::rast(out_file)
 
+  # split by variables if more than one is selected
+  if (length(vars) > 1)
+  {
+    rdata <- terra::split(rdata, names(rdata))
+    names(rdata) <- lapply(rdata, function(x) unique(names(x)))
+  } else{
+    rdata <- list(rdata)
+    names(rdata) <- unique(names(rdata[[1]]))
+  }
+
   # perform temporal aggregation if specified
   if (!is.null(agglevel))
+    rdata <- lapply(
+      rdata,
+      function(o) terra::tapp(o, index=agglevel, fun="mean")
+    )
+
+  # if 'where' is a matrix/data frame, extract elevation values for points
+  if (inherits(where, c("matrix", "data.frame")))
   {
-    rdata <- terra::tapp(rdata, index=agglevel, fun="mean")
+    where <- data.frame(where)
+    rdata <- lapply(rdata, function(o){
+      out <- terra::extract(o, where, ID=FALSE)
+      data.frame(where, out)
+    })
   }
+
+  if (length(rdata) == 1)
+    rdata <- rdata[[1]]
 
   return(rdata)
 }

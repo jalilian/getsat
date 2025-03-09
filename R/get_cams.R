@@ -196,7 +196,7 @@ get_cams <- function(key,
   }
 
   # Define output filename
-  dfile <- paste0("cams_hourly_", year, "_", month, ".zip")
+  dfile <- paste0("cams_europe_", year, "_", month, ".zip")
 
   # request for getting data
   request <- list(
