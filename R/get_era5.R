@@ -107,6 +107,7 @@
 #' st2 <- get_era5_land(key, vars = c("skin_temperature", "2m_temperature"),
 #'                      where = cbind(runif(100, 6, 18), runif(100, 36, 47)),
 #'                      year = 2022, month = 10, day=6:7)
+#' print(st2)
 #' }
 #'
 #' @seealso \link[terra]{rast}, \link[ecmwfr]{wf_set_key}, \link[ecmwfr]{wf_request}
