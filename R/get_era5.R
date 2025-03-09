@@ -214,8 +214,8 @@ get_era5_land <- function(key,
   }
 
   # validate bounding box format
-  if (area[1] >= area[3] || area[4] >= area[2])
-    stop("Bounding box must be in the format c(North, West, South, East) with valid coordinates.")
+  if (area[3] >= area[1] || area[2] >= area[4])
+    stop("Area must be in the format c(North, West, South, East) with valid coordinates.")
 
   # validate the year
   if (any(year < 1940))
