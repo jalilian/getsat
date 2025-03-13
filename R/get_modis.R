@@ -153,6 +153,13 @@ get_modis <- function(where,
       collection <- collecs_modis$id[idx]
       message(var, " has been found in collection(s): ",
               paste(collection, collapse = ", "))
+      if (length(collection) > 1)
+      {
+        message(collection[1],
+                " is sellected. Use argument 'collection' if you need ",
+                collection[-1])
+        collection <- collection[1]
+      }
     } else{
       stop(var, " was not found in any collection.")
     }
