@@ -219,7 +219,7 @@ get_modis <- function(where,
       x[[1]]
     } else{
       # merge raster tiles into a single raster,  if more than one tile
-      do.call(terra::mosaic, c(x, list(fun="mean")))
+      do.call(terra::mosaic, c(x, fun="mean"))
     }
   })
 
@@ -236,7 +236,7 @@ get_modis <- function(where,
   }
   # perform temporal aggregation if specified
   if (!is.null(agglevel))
-    rdata <- terra::tapp(rdata, index=agglevel, fun="mean")
+    rdata <- terra::tapp(rdata, index=agglevel, fun="mean", na.rm=TRUE)
 
   # projection to EPSG:4326 (World Geodetic System 1984, WGS84)
   rdata <- terra::project(rdata, "EPSG:4326")
