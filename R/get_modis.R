@@ -116,7 +116,7 @@ get_modis <- function(where,
                       clean_dir=FALSE)
 {
   message("See 'Data Use Guidelines for NASA Terra and Aqua MODIS, Suomi NPP, and other Collections.'\n",
-          "- Available at <https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf>")
+          "- Available at <https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf>\n")
 
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
