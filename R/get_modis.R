@@ -249,5 +249,9 @@ get_modis <- function(where,
     names(rdata) <- paste(var, names(rdata), sep="_")
     rdata <- data.frame(where, rdata)
   }
+
+  if (clean_dir)
+    unlink(output_dir, recursive=TRUE, force=TRUE)
+
   return(rdata)
 }
