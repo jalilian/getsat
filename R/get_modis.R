@@ -199,6 +199,9 @@ get_modis <- function(where,
                   return(data.frame(collection=parts[1], date=date, tile=tile))
                 }))
 
+  if (clean_dir)
+    initial_files <- list.files(output_dir, full.names=TRUE)
+
   # download items for the slected var(s)
   items <- items |>
     rstac::assets_select(asset_names=var) |>
@@ -258,7 +261,11 @@ get_modis <- function(where,
   }
 
   if (clean_dir)
-    unlink(output_dir, recursive=TRUE, force=TRUE)
+  {
+    new_files <- setdiff(list.files(output_dir, full.names=TRUE), initial_files)
+    # remove only the new files
+    file.remove(new_files)
+  }
 
   return(rdata)
 }
