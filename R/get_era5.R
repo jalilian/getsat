@@ -208,7 +208,7 @@ get_era5_land <- function(key,
   {
     area <- c(
       max(where[, 2]) + 0.15, min(where[, 1]) - 0.15,
-      max(where[, 2]) - 0.15, max(where[, 2]) + 0.15
+      max(where[, 2]) - 0.15, max(where[, 1]) + 0.15
     )
   } else {
     stop("'where' must be a numeric vector of length 4 (area) or a matrix/data.frame with two columns (longitude, latitude).")
