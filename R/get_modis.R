@@ -227,6 +227,7 @@ get_modis <- function(where,
       setTxtProgressBar(pb, icount)
       return(r)
     })
+    cat("\n")
   } else{
     if (clean_dir)
       initial_files <- list.files(output_dir, full.names=TRUE)
