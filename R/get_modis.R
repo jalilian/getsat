@@ -290,7 +290,7 @@ get_modis <- function(where,
     rdata <- data.frame(where, rdata)
   }
 
-  if (clean_dir)
+  if (download && clean_dir)
   {
     new_files <- setdiff(list.files(output_dir, full.names=TRUE), initial_files)
     # remove only the new files
