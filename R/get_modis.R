@@ -129,8 +129,8 @@ get_modis <- function(where,
   } else if (inherits(where, c("matrix", "data.frame")) && ncol(where) == 2)
   {
     bbox <- c(
-      min(where[, 1]) - 0.15, min(where[, 2]) - 0.15,
-      max(where[, 1]) + 0.15, max(where[, 2]) + 0.15
+      min(where[, 1]) - 0.2, min(where[, 2]) - 0.2,
+      max(where[, 1]) + 0.2, max(where[, 2]) + 0.2
     )
   } else {
     stop("'where' must be a numeric vector of length 4 (bounding box) or a matrix/data.frame with two columns (longitude, latitude).")
@@ -158,14 +158,15 @@ get_modis <- function(where,
       message(var, " has been found in collection(s):\n",
               paste(capture.output(print(collection)), collapse = "\n"),
               "\n")
-      if (length(collection) > 1)
+      if (nrow(collection) > 1)
       {
         message(collection[1, 1], " (", collection[1, 2],
                 ") is selected.\nUse argument 'collection' if you need: ",
                 paste(collection[-1, 1], collapse = ", "),
                 "\n")
-        collection <- collection[1, 1]
+        collection <- collection[1, ]
       }
+      collection <- collection[1, 1]
     } else{
       stop(var, " was not found in any collection.")
     }
@@ -269,12 +270,16 @@ get_modis <- function(where,
     terra::time(r) <- as.Date(d);
     return(r)
   }, rdata, names(rdata), SIMPLIFY=FALSE)
+
   # convert list of rasters to one multi-layer raster
   rdata <- terra::rast(rdata)
+
+  # moving window (focal) aggregation by window size w
   if (!is.na(w))
   {
     rdata <- terra::focal(rdata, w=w, fun="mean", na.policy="only", na.rm=TRUE)
   }
+
   # perform temporal aggregation if specified
   if (!is.null(agglevel))
     rdata <- terra::tapp(rdata, index=agglevel, fun="mean", na.rm=TRUE)
@@ -288,7 +293,7 @@ get_modis <- function(where,
     where <- data.frame(where)
     rdata <- terra::extract(rdata, where, ID=FALSE)
     names(rdata) <- paste(var, names(rdata), sep="_")
-    rdata <- data.frame(where, rdata)
+    rdata <- cbind(where, rdata)
   }
 
   if (download && clean_dir)
