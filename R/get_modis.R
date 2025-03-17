@@ -36,8 +36,11 @@
 #'        - `"days"` (default), `"doy"` (day of the year)
 #'        - `"7days"`, `"10days"`, `"15days"`
 #'
+#' @param download Logical. If `TRUE`, MODIS files will be downloaded before processing.
+#'        If `FALSE` (default), data is read directly from the server without downloading.
+#'
 #' @param output_dir A character string specifying the directory where downloaded files should be saved.
-#'                   Default is a temporary directory.
+#'        Default is a temporary directory.
 #'
 #' @param clean_dir Logical, whether to clean the output directory before downloading new files. Default is FALSE.
 #'
@@ -112,6 +115,7 @@ get_modis <- function(where,
                       crop=TRUE,
                       w=NA,
                       agglevel=NULL,
+                      download=FALSE,
                       output_dir=tempdir(),
                       clean_dir=FALSE)
 {
@@ -150,15 +154,17 @@ get_modis <- function(where,
                   function(o) var %in% o, logical(length(var)))
     if (sum(idx) > 0)
     {
-      collection <- collecs_modis$id[idx]
-      message(var, " has been found in collection(s): ",
-              paste(collection, collapse = ", "))
+      collection <- collecs_modis[idx, c("id", "title")]
+      message(var, " has been found in collection(s):\n",
+              paste(capture.output(print(collection)), collapse = "\n"),
+              "\n")
       if (length(collection) > 1)
       {
-        message(collection[1],
-                " is sellected. Use argument 'collection' if you need ",
-                collection[-1])
-        collection <- collection[1]
+        message(collection[1, 1], " (", collection[1, 2],
+                ") is sellected.\nUse argument 'collection' if you need: ",
+                paste(collection[-1, 1], collapse = ", "),
+                "\n")
+        collection <- collection[1, 1]
       }
     } else{
       stop(var, " was not found in any collection.")
@@ -199,28 +205,44 @@ get_modis <- function(where,
                   return(data.frame(collection=parts[1], date=date, tile=tile))
                 }))
 
-  if (clean_dir)
-    initial_files <- list.files(output_dir, full.names=TRUE)
+  if (!download)
+  {
+    # load and process rasters
+    rdata <- lapply(items$features, function(o){
+      r <- terra::rast(o$assets[[var]]$href)
+      if (crop)
+      {
+        # project the extent to match the raster's CRS
+        pbx <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+        w <- terra::intersect(terra::ext(r), pbx)
+        r <- terra::crop(r, pbx)
+      }
+      return(r)
+    })
+  } else{
+    if (clean_dir)
+      initial_files <- list.files(output_dir, full.names=TRUE)
 
-  # download items for the slected var(s)
-  items <- items |>
-    rstac::assets_select(asset_names=var) |>
-    rstac::assets_download(asset_names = var,
-                           items_max=length(items$features),
-                           overwrite=TRUE, output_dir=output_dir)
+    # download items for the slected var(s)
+    items <- items |>
+      rstac::assets_select(asset_names=var) |>
+      rstac::assets_download(asset_names = var,
+                             items_max=Inf,
+                             overwrite=TRUE, output_dir=output_dir)
 
-  # load and process rasters
-  rdata <- lapply(items$features, function(o){
-    r <- terra::rast(o$assets[[var]]$href)
-    if (crop)
-    {
-      # project the extent to match the raster's CRS
-      pbx <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
-      w <- terra::intersect(terra::ext(r), pbx)
-      r <- terra::crop(r, pbx)
-    }
-    return(r)
-  })
+    # load and process rasters
+    rdata <- lapply(items$features, function(o){
+      r <- terra::rast(o$assets[[var]]$href)
+      if (crop)
+      {
+        # project the extent to match the raster's CRS
+        pbx <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+        w <- terra::intersect(terra::ext(r), pbx)
+        r <- terra::crop(r, pbx)
+      }
+      return(r)
+    })
+  }
 
   # group rasters by date and mosaic them if needed
   rdata <- lapply(split(rdata, ids$date), function(x){
