@@ -221,7 +221,7 @@ get_modis <- function(where,
         r <- terra::crop(r, pbx)
       }
       # ppdate the progress bar
-      icount <- icount + 1
+      icount <<- icount + 1
       setTxtProgressBar(pb, icount)
       return(r)
     })
