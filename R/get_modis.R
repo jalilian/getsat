@@ -220,11 +220,11 @@ get_modis <- function(where,
         w <- terra::intersect(terra::ext(r), pbx)
         r <- terra::crop(r, pbx)
       }
+      # ppdate the progress bar
+      icount <- icount + 1
+      setTxtProgressBar(pb, icount)
       return(r)
     })
-    # ppdate the progress bar
-    icount <- icount + 1
-    setTxtProgressBar(pb, icount)
   } else{
     if (clean_dir)
       initial_files <- list.files(output_dir, full.names=TRUE)
