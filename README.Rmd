@@ -64,7 +64,7 @@ This example shows how to retrieve 8-day daytime temperature data from the [Mode
 ```{r example2}
 # Retrieve temperature data for a bounding box (longitude/latitude) and specific time period
 temp <- get_modis(c(47, 34, 47.5, 35), var = "LST_Day_1KM",
-                  datetime = "2025-01-01/2025-03-08")
+                  datetime = "2025-01-01/2025-03-09")
 # plot retrived temperature data
 terra::plot(temp)
 ```

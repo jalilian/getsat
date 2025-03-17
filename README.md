@@ -72,12 +72,12 @@ elev2 <- get_dem(coords, res = 90)
 # Print retrieved elevation values
 head(elev2)
 #>         X1       X2 elevation
-#> 1 47.41239 34.77327  2069.640
-#> 2 47.46641 34.97685  1852.240
-#> 3 47.18218 34.98562  2001.430
-#> 4 47.16283 34.00769  1644.024
-#> 5 47.24598 34.15589  1666.759
-#> 6 47.14028 34.90247  1915.603
+#> 1 47.37065 34.97248  1913.149
+#> 2 47.05973 34.59647  2681.496
+#> 3 47.40024 34.01966  1993.446
+#> 4 47.00512 34.47211  1305.152
+#> 5 47.01818 34.16804  1521.923
+#> 6 47.24421 34.88025  1776.818
 ```
 
 ## Example 2: Retrieve temprature from MODIS
@@ -94,11 +94,14 @@ in the format “YYYY-MM-DD/YYYY-MM-DD”.
 ``` r
 # Retrieve temperature data for a bounding box (longitude/latitude) and specific time period
 temp <- get_modis(c(47, 34, 47.5, 35), var = "LST_Day_1KM",
-                  datetime = "2025-01-01/2025-03-08")
+                  datetime = "2025-01-01/2025-03-09")
 #> See 'Data Use Guidelines for NASA Terra and Aqua MODIS, Suomi NPP, and other Collections.'
 #> - Available at <https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Citation_Policies.pdf>
-#> LST_Day_1KM has been found in collection(s): modis-21A2-061
-#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   6%  |                                                                              |=========                                                             |  12%  |                                                                              |=============                                                         |  19%  |                                                                              |==================                                                    |  25%  |                                                                              |======================                                                |  31%  |                                                                              |==========================                                            |  38%  |                                                                              |===============================                                       |  44%  |                                                                              |===================================                                   |  50%  |                                                                              |=======================================                               |  56%  |                                                                              |============================================                          |  62%  |                                                                              |================================================                      |  69%  |                                                                              |====================================================                  |  75%  |                                                                              |=========================================================             |  81%  |                                                                              |=============================================================         |  88%  |                                                                              |==================================================================    |  94%  |                                                                              |======================================================================| 100%
+#> LST_Day_1KM has been found in collection(s):
+#>                id                                                  title
+#> 55 modis-21A2-061 MODIS Land Surface Temperature/3-Band Emissivity 8-Day
+#> modis-21A2-061 (MODIS Land Surface Temperature/3-Band Emissivity 8-Day) is sellected.
+#> Use argument 'collection' if you need:
 # plot retrived temperature data
 terra::plot(temp)
 ```
