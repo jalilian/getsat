@@ -207,6 +207,9 @@ get_modis <- function(where,
 
   if (!download)
   {
+    # create the progress bar
+    pb <- txtProgressBar(min=0, max=length(items$features), style=3)
+    icount <- 0
     # load and process rasters
     rdata <- lapply(items$features, function(o){
       r <- terra::rast(o$assets[[var]]$href)
@@ -219,6 +222,9 @@ get_modis <- function(where,
       }
       return(r)
     })
+    # ppdate the progress bar
+    icount <- icount + 1
+    setTxtProgressBar(pb, icount)
   } else{
     if (clean_dir)
       initial_files <- list.files(output_dir, full.names=TRUE)
