@@ -179,7 +179,7 @@ get_modis <- function(where,
       # date-time range
       datetime = datetime,
       # maximum number of results
-      limit = 999
+      limit = NULL
     ) |>
     # HTTP GET requests to STAC web services
     rstac::get_request() |>
