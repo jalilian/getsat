@@ -161,7 +161,7 @@ get_modis <- function(where,
       if (length(collection) > 1)
       {
         message(collection[1, 1], " (", collection[1, 2],
-                ") is sellected.\nUse argument 'collection' if you need: ",
+                ") is selected.\nUse argument 'collection' if you need: ",
                 paste(collection[-1, 1], collapse = ", "),
                 "\n")
         collection <- collection[1, 1]
