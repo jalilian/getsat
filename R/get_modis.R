@@ -204,7 +204,8 @@ get_modis <- function(where,
                   tile <- parts[3]
                   return(data.frame(collection=parts[1], date=date, tile=tile))
                 }))
-  message("Getting MODIS tiles: ", names(table(ids$tile)), "\n")
+  message("Getting MODIS tiles: ",
+          paste(names(table(ids$tile)), collapse = ", "), "\n")
 
   if (!download)
   {
