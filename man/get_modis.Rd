@@ -12,6 +12,7 @@ get_modis(
   crop = TRUE,
   w = NA,
   agglevel = NULL,
+  download = FALSE,
   output_dir = tempdir(),
   clean_dir = FALSE
 )
@@ -45,6 +46,9 @@ in the \code{terra} package. Available options include:
 - \code{"weeks"} (ISO 8601 week number), \code{"yearweeks"}
 - \code{"days"} (default), \code{"doy"} (day of the year)
 - \code{"7days"}, \code{"10days"}, \code{"15days"}}
+
+\item{download}{Logical. If \code{TRUE}, MODIS files will be downloaded before processing.
+If \code{FALSE} (default), data is read directly from the server without downloading.}
 
 \item{output_dir}{A character string specifying the directory where downloaded files should be saved.
 Default is a temporary directory.}
