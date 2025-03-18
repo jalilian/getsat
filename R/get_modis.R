@@ -42,9 +42,16 @@
 #' @param output_dir A character string specifying the directory where downloaded files should be saved.
 #'        Default is a temporary directory.
 #'
-#' @param clean_dir Logical, whether to clean the output directory before downloading new files. Default is FALSE.
+#' @param clean_dir Logical. If `TRUE`, downloaded files are deleted after processing
+#' (applies only when `download = TRUE`). Default is `FALSE`.
 #'
 #' @details
+#'
+#'#' **Important Note:**
+#' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
+#' and Microsoft (host, processor). Users are required to follow the license and
+#' terms of use specified by NASA and Microsoft. Failure to do so may violate
+#' the data usage policies.
 #'
 #' This function allows users to retrieve MODIS satellite data for specified
 #' geographic regions and time periods. MODIS provides various environmental
@@ -52,11 +59,6 @@
 #' and primary productivity. The following table provides information on available
 #' MODIS collections and their corresponding variables:
 #'
-#' **Important Note:**
-#' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
-#' and Microsoft (host, processor). Users are required to follow the license and
-#' terms of use specified by NASA and Microsoft. Failure to do so may violate
-#' the data usage policies.
 #'
 #' \tabular{lll}{
 #'   \strong{id} \tab \strong{title} \tab \strong{vars} \cr
@@ -82,7 +84,8 @@
 #' }
 #'
 #' MODIS data is available for different time intervals (daily, 8-day, 16-day,
-#' or yearly) and is provided in 10° x 10° tiles at the equator.
+#' or yearly) and is provided in 10° x 10° tiles at the equator. The tile grid
+#' consists of 36 horizontal (h00 to h35) and 18 vertical (v00 to v17) tiles.
 #'
 #' @examples
 #' \dontrun{
