@@ -167,8 +167,8 @@ get_modis <- function(where,
                 ") is selected.\nUse argument 'collection' if you need: ",
                 paste(collection[-1, 1], collapse = ", "),
                 "\n")
-        collection <- collection[1, ]
       }
+      message(paste("\nCollection description:\n", collection[1, 3], "\n"))
       collection <- collection[1, 1]
     } else{
       stop(var, " was not found in any collection.")

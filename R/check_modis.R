@@ -55,10 +55,12 @@ check_modis <- function()
     # allow access assets from Microsoft's Planetary Computer
     rstac::items_sign(sign_fn=rstac::sign_planetary_computer())
 
-  # extract id and title of collections
+  # extract id, title and description of collections
   collecs_modis <- do.call(rbind, lapply(collecs$collections, function(o) {
-    data.frame(id = o$id, title = o$title, stringsAsFactors=FALSE)
+    data.frame(id = o$id, title = o$title, description=o$description,
+               stringsAsFactors=FALSE)
   }))
+
   # filter MODIS collections
   idx <- grepl("^modis", collecs_modis$id)
   if (!any(idx))
