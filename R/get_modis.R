@@ -157,9 +157,10 @@ get_modis <- function(where,
                   function(o) var %in% o, logical(length(var)))
     if (sum(idx) > 0)
     {
-      collection <- collecs_modis[idx, c("id", "title")]
+      collection <- collecs_modis[idx, c("id", "title", "description")]
       message(var, " has been found in collection(s):\n",
-              paste(capture.output(print(collection)), collapse = "\n"),
+              paste(capture.output(print(unname(collection[, 1:2]))),
+                    collapse = "\n"),
               "\n")
       if (nrow(collection) > 1)
       {
@@ -168,11 +169,14 @@ get_modis <- function(where,
                 paste(collection[-1, 1], collapse = ", "),
                 "\n")
       }
-      message(paste("\nCollection description:\n", collection[1, 3], "\n"))
+      message(paste(strrep("-", 50), "\nCollection description:\n",
+                    collection[1, 3], "\n", strrep("-", 50), "\n"))
       collection <- collection[1, 1]
     } else{
       stop(var, " was not found in any collection.")
     }
+
+    rm(collecs_modis)
   }
 
 
