@@ -198,6 +198,9 @@ get_modis <- function(where,
     # fetch all STAC Items
     rstac::items_fetch()
 
+  if (length(items$features) == 0)
+    stop("Nothing has been retrieved from the server.")
+
   ids <- do.call(rbind, lapply(items$features,
                 function(o){
                   # Split by "." and extract date and tile
