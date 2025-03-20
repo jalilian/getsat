@@ -221,6 +221,14 @@ get_modis <- function(where,
 
   if (!download)
   {
+    # check HTTP errors
+    httperror <- vapply(items$features, function(o) {
+      httr::http_error(o$assets[[var]]$href)
+    }, logical(1))
+    if (any(httperror))
+      stop("HTTP request failed for tiles and dates below (status code 4xx):\n",
+           paste(capture.output(print(ids[httperror, ])), collapse="\n"))
+
     # create the progress bar
     pb <- txtProgressBar(min=0, max=length(items$features), style=3)
     icount <- 0
