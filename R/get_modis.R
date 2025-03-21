@@ -179,29 +179,54 @@ get_modis <- function(where,
     rm(collecs_modis)
   }
 
+  # attempt to connect to the API
+  attempt <- 1
+  repeat {
+    # check API connectivity
+    status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
+    status <- httr::status_code(status)
 
-  # Connect to the Microsoft Planetary Computer STAC API
-  items <- rstac::stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1"
-  ) |>
-    # STAC search API
-    rstac::stac_search(
-      # collection IDs to include in the search for items
-      collections = collection,
-      # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-      bbox = bbox,
-      # date-time range
-      datetime = datetime,
-      # maximum number of results
-      limit = NULL
-    ) |>
-    # HTTP GET requests to STAC web services
-    rstac::get_request() |>
-    # allow access assets from Microsoft's Planetary Computer
-    rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
-    # fetch all STAC Items
-    rstac::items_fetch()
+    if (status == 200)
+    {
+      message("Connecting to the Microsoft Planetary Computer STAC API...\n")
+      # Connect to the Microsoft Planetary Computer STAC API
+      items <- rstac::stac(
+        "https://planetarycomputer.microsoft.com/api/stac/v1"
+      ) |>
+        # STAC search API
+        rstac::stac_search(
+          # collection IDs to include in the search for items
+          collections = collection,
+          # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
+          bbox = bbox,
+          # date-time range
+          datetime = datetime,
+          # maximum number of results
+          limit = NULL
+        ) |>
+        # HTTP GET requests to STAC web services
+        rstac::get_request() |>
+        # allow access assets from Microsoft's Planetary Computer
+        rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
+        # fetch all STAC Items
+        rstac::items_fetch()
+      break
+    } else if (attempt >= 5) {
+      stop("Failed to connect to the API after ", 5,
+           " attempts. Last status code: ", status)
+    } else {
+      message("Attempt ", attempt, " failed with status code ", status,
+              ". Retrying in ", 2, " seconds...")
+      Sys.sleep(2)
+      attempt <- attempt + 1
+    }
+  }
 
+  # check API connectivity
+  status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
+  status <- httr::status_code(status)
+
+  # validate results
   if (length(items$features) == 0)
     stop("No data retrieved. Data may be unavailable for the specified period.")
 
