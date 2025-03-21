@@ -1,0 +1,30 @@
+name: R-CMD-check
+
+on:
+  push:
+    branches: [main, master]  # Runs checks on push to these branches
+  pull_request:
+    branches: [main, master]  # Runs checks for pull requests
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]  # Run on all OS
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck  # Ensures rcmdcheck is installed
+
+      - name: Check R package
+        run: rcmdcheck::rcmdcheck(error_on = "warning", args = "--no-manual")
+        shell: Rscript {0}
