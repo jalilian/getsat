@@ -229,6 +229,8 @@ get_modis <- function(where,
 
   if (!download)
   {
+    # set temporary directory for terra
+    terra::terraOptions(tmpdir = output_dir)
     # create the progress bar
     pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
     icount <- 0
@@ -247,6 +249,8 @@ get_modis <- function(where,
       utils::setTxtProgressBar(pb, icount)
       return(r)
     })
+    # clean up terra temporary files
+    terra::tmpFiles(remove = TRUE)
     cat("\n")
   } else{
     if (clean_dir)
