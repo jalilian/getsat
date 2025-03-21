@@ -158,13 +158,15 @@ get_modis <- function(where,
     if (sum(idx) > 0)
     {
       collection <- collecs_modis[idx, c("id", "title", "description")]
-      message(var, " has been found in collection(s):\n",
+      message(paste0("\033[", 32, "m", var, "\033[0m"),
+              " has been found in collection(s):\n",
               paste(utils::capture.output(print(unname(collection[, 1:2]))),
                     collapse = "\n"),
               "\n")
       if (nrow(collection) > 1)
       {
-        message(collection[1, 1], " (", collection[1, 2],
+        message(paste0("\033[", 34, "m", collection[1, 1], "\033[0m"),
+                " (", collection[1, 2],
                 ") is selected.\nUse argument 'collection' if you need: ",
                 paste(collection[-1, 1], collapse = ", "),
                 "\n")
