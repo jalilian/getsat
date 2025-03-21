@@ -1,7 +1,7 @@
 Package: getsat
 Title: Retrieving Commonly Used Satellite Data
-Version: 0.1.0
-Date: 2025-03-09
+Version: 0.1.1
+Date: 2025-03-21
 Depends: R (>= 4.2.0)
 Maintainer: Abdollah Jalilian <stat4aj@gmail.com>
 Authors@R: 
@@ -23,7 +23,8 @@ RoxygenNote: 7.3.2
 Imports: 
     ecmwfr,
     rstac,
-    terra
+    terra,
+    httr
 Suggests:
     knitr,
     rmarkdown

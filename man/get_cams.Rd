@@ -21,14 +21,14 @@ get_cams(
 \item{vars}{A character vector specifying air quality variables to retrieve.
 Supported values include:
 \itemize{
-\item "ammonia" – Ammonia (NH₃)
+\item "ammonia" – Ammonia (NH$_3$)
 \item "carbon_monoxide" – Carbon monoxide (CO)
 \item "formaldehyde" – Formaldehyde (HCHO)
 \item "glyoxal" – Glyoxal (CHOCHO)
-\item "nitrogen_dioxide" – Nitrogen dioxide (NO₂)
+\item "nitrogen_dioxide" – Nitrogen dioxide (NO$_2$)
 \item "nitrogen_monoxide" – Nitrogen monoxide (NO)
 \item "non_methane_vocs" – Non-methane volatile organic compounds (NMVOCs)
-\item "ozone" – Ozone (O₃)
+\item "ozone" – Ozone (O$_3$)
 \item "particulate_matter_10um" – Particulate matter with diameter < 10 µm (PM10)
 \item "dust" – PM10 dust fraction
 \item "pm10_sea_salt_dry" – PM10 sea salt (dry)
@@ -39,7 +39,7 @@ Supported values include:
 \item "secondary_inorganic_aerosol" – PM2.5 secondary inorganic aerosol (SIA)
 \item "pm2.5_total_organic_matter" – PM2.5 total organic matter
 \item "peroxyacyl_nitrates" – Peroxyacyl nitrates (PANs)
-\item "sulphur_dioxide" – Sulphur dioxide (SO₂)
+\item "sulphur_dioxide" – Sulphur dioxide (SO$_2$)
 }}
 
 \item{where}{Either:

@@ -15,14 +15,14 @@
 #'
 #' @param vars A character vector specifying air quality variables to retrieve.
 #'   Supported values include:
-#'   - "ammonia" – Ammonia (NH₃)
+#'   - "ammonia" – Ammonia (NH$_3$)
 #'   - "carbon_monoxide" – Carbon monoxide (CO)
 #'   - "formaldehyde" – Formaldehyde (HCHO)
 #'   - "glyoxal" – Glyoxal (CHOCHO)
-#'   - "nitrogen_dioxide" – Nitrogen dioxide (NO₂)
+#'   - "nitrogen_dioxide" – Nitrogen dioxide (NO$_2$)
 #'   - "nitrogen_monoxide" – Nitrogen monoxide (NO)
 #'   - "non_methane_vocs" – Non-methane volatile organic compounds (NMVOCs)
-#'   - "ozone" – Ozone (O₃)
+#'   - "ozone" – Ozone (O$_3$)
 #'   - "particulate_matter_10um" – Particulate matter with diameter < 10 µm (PM10)
 #'   - "dust" – PM10 dust fraction
 #'   - "pm10_sea_salt_dry" – PM10 sea salt (dry)
@@ -33,7 +33,7 @@
 #'   - "secondary_inorganic_aerosol" – PM2.5 secondary inorganic aerosol (SIA)
 #'   - "pm2.5_total_organic_matter" – PM2.5 total organic matter
 #'   - "peroxyacyl_nitrates" – Peroxyacyl nitrates (PANs)
-#'   - "sulphur_dioxide" – Sulphur dioxide (SO₂)
+#'   - "sulphur_dioxide" – Sulphur dioxide (SO$_2$)
 #'
 #' @param where Either:
 #'   - A numeric vector of length 4 defining the bounding box for the region of
@@ -244,8 +244,8 @@ get_cams <- function(key,
   )
 
   # unzip downloaded file
-  zfiles <- unzip(out_file, list=TRUE)
-  unzip(out_file, exdir=temp_dir)
+  zfiles <- utils::unzip(out_file, list=TRUE)
+  utils::unzip(out_file, exdir=temp_dir)
 
   # create a SpatRaster object from the downloaded data file
   rdata <- lapply(

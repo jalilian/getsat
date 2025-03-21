@@ -159,7 +159,7 @@ get_modis <- function(where,
     {
       collection <- collecs_modis[idx, c("id", "title", "description")]
       message(var, " has been found in collection(s):\n",
-              paste(capture.output(print(unname(collection[, 1:2]))),
+              paste(utils::capture.output(print(unname(collection[, 1:2]))),
                     collapse = "\n"),
               "\n")
       if (nrow(collection) > 1)
@@ -225,12 +225,12 @@ get_modis <- function(where,
   }, logical(1))
   if (any(httperror))
     stop("HTTP request failed for tiles and dates below (status code 4xx):\n",
-         paste(capture.output(print(ids[httperror, ])), collapse="\n"))
+         paste(utils::capture.output(print(ids[httperror, ])), collapse="\n"))
 
   if (!download)
   {
     # create the progress bar
-    pb <- txtProgressBar(min=0, max=length(items$features), style=3)
+    pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
     icount <- 0
     # load and process rasters
     rdata <- lapply(items$features, function(o){
@@ -244,7 +244,7 @@ get_modis <- function(where,
       }
       # ppdate the progress bar
       icount <<- icount + 1
-      setTxtProgressBar(pb, icount)
+      utils::setTxtProgressBar(pb, icount)
       return(r)
     })
     cat("\n")
