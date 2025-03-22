@@ -224,10 +224,6 @@ get_modis <- function(where,
     }
   }
 
-  # check API connectivity
-  status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
-  status <- httr::status_code(status)
-
   # validate results
   if (length(items$features) == 0)
     stop("No data retrieved. Data may be unavailable for the specified period.")

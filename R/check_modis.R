@@ -44,16 +44,37 @@
 #' @export
 check_modis <- function()
 {
-  # Connect to the Microsoft Planetary Computer STAC API
-  collecs <- rstac::stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1"
-  ) |>
-    # Retrieve all collections
-    rstac::collections() |>
-    # HTTP GET requests to STAC web services
-    rstac::get_request() |>
-    # allow access assets from Microsoft's Planetary Computer
-    rstac::items_sign(sign_fn=rstac::sign_planetary_computer())
+  # attempt to connect to the API
+  attempt <- 1
+  repeat {
+    # check API connectivity
+    status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
+    status <- httr::status_code(status)
+
+    if (status == 200)
+    {
+      # Connect to the Microsoft Planetary Computer STAC API
+      collecs <- rstac::stac(
+        "https://planetarycomputer.microsoft.com/api/stac/v1"
+      ) |>
+        # Retrieve all collections
+        rstac::collections() |>
+        # HTTP GET requests to STAC web services
+        rstac::get_request() |>
+        # allow access assets from Microsoft's Planetary Computer
+        rstac::items_sign(sign_fn=rstac::sign_planetary_computer())
+
+      break
+    } else if (attempt >= 5) {
+      stop("Failed to connect to the API after ", 5,
+           " attempts. Last status code: ", status)
+    } else {
+      message("Attempt ", attempt, " failed with status code ", status,
+              ". Retrying in ", 2, " seconds...")
+      Sys.sleep(2)
+      attempt <- attempt + 1
+    }
+  }
 
   # extract id, title and description of collections
   collecs_modis <- do.call(rbind, lapply(collecs$collections, function(o) {
