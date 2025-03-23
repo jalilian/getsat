@@ -181,6 +181,10 @@ get_modis <- function(where,
     rm(collecs_modis)
   }
 
+  # set a new timeout value (e.g., 60 seconds)
+  oldtimeout <- getOption("timeout")
+  options(timeout=3600)
+
   # attempt to connect to the API
   attempt <- 1
   repeat {
@@ -348,6 +352,9 @@ get_modis <- function(where,
     # remove only the new files
     file.remove(new_files)
   }
+
+  # restore the original timeout
+  options(timeout=oldtimeout)
 
   return(rdata)
 }
