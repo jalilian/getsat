@@ -171,7 +171,7 @@ get_modis <- function(where,
                 paste(collection[-1, 1], collapse = ", "),
                 "\n")
       }
-      message(paste(strrep("-", 50), "\nCollection description:\n",
+      message(paste("-- Collection description ", strrep("-", 24), "\n",
                     collection[1, 3], "\n", strrep("-", 50), "\n"))
       collection <- collection[1, 1]
     } else{
