@@ -79,7 +79,7 @@ get_dem <- function(where,
 
   # valid geographical boundaries
   if (any(bbox[1] <= -180 | bbox[3] >= 180 |
-          bbox[2] <= 90 | bbox[4] >= 90))
+          bbox[2] <= -90 | bbox[4] >= 90))
     stop("The specified area is outside the valid data coverage region.")
 
   # validate resolution
