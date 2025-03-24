@@ -77,6 +77,11 @@ get_dem <- function(where,
   if (bbox[1] >= bbox[3] || bbox[2] >= bbox[4])
     stop("Bounding box must be in the format c(xmin, ymin, xmax, ymax) with valid coordinates.")
 
+  # valid geographical boundaries
+  if (any(bbox[1] <= -180 | bbox[3] >= 180 |
+          bbox[2] <= 90 | bbox[4] >= 90))
+    stop("The specified area is outside the valid data coverage region.")
+
   # validate resolution
   if (!res %in% c(30, 90))
     stop("'res' must be either 30 or 90 meters.")
