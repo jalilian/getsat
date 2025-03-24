@@ -81,29 +81,50 @@ get_dem <- function(where,
   if (!res %in% c(30, 90))
     stop("'res' must be either 30 or 90 meters.")
 
-  # retrieve DEM tiles from Microsoft Planetary Computer
-  items <- rstac::stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1"
-  ) |>
-    # STAC search API
-    rstac::stac_search(
-      # collection IDs to include in the search for items
-      collections = paste0("cop-dem-glo-", res),
-      # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-      bbox = bbox,
-      # maximum number of results
-      limit = 999
-    ) |>
-    # HTTP GET requests to STAC web services
-    rstac::get_request() |>
-    # allow access assets from Microsoft's Planetary Computer
-    rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
-    # fetch all STAC Items
-    rstac::items_fetch() |>
-    # download items
-    rstac::assets_download(asset_names="data",
-                           overwrite=TRUE,
-                           output_dir=output_dir)
+  # attempt to connect to the API
+  attempt <- 1
+  repeat {
+    # check API connectivity
+    status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
+    status <- httr::status_code(status)
+
+    if (status == 200)
+    {
+      # retrieve DEM tiles from Microsoft Planetary Computer
+      items <- rstac::stac(
+        "https://planetarycomputer.microsoft.com/api/stac/v1"
+      ) |>
+        # STAC search API
+        rstac::stac_search(
+          # collection IDs to include in the search for items
+          collections = paste0("cop-dem-glo-", res),
+          # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
+          bbox = bbox,
+          # maximum number of results
+          limit = 999
+        ) |>
+        # HTTP GET requests to STAC web services
+        rstac::get_request() |>
+        # allow access assets from Microsoft's Planetary Computer
+        rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
+        # fetch all STAC Items
+        rstac::items_fetch() |>
+        # download items
+        rstac::assets_download(asset_names="data",
+                               overwrite=TRUE,
+                               output_dir=output_dir)
+
+      break
+    } else if (attempt >= 5) {
+      stop("Failed to connect to the API after ", 5,
+           " attempts. Last status code: ", status)
+    } else {
+      message("Attempt ", attempt, " failed with status code ", status,
+              ". Retrying in ", 2, " seconds...")
+      Sys.sleep(2)
+      attempt <- attempt + 1
+    }
+  }
 
   # load and crop DEM tiles
   rdata <- lapply(items$features,
@@ -120,7 +141,7 @@ get_dem <- function(where,
     rdata <- rdata[[1]]
   } else{
     # merge raster tiles into a single raster,  if more than one tile
-    rdata <- do.call(terra::mosaic, c(rdata, list(fun="modal")))
+    rdata <- do.call(terra::mosaic, c(rdata, list(fun="mean")))
   }
 
   # projection to EPSG:4326 (World Geodetic System 1984, WGS84)
