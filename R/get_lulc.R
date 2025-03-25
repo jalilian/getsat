@@ -100,47 +100,79 @@ get_lulc <- function(where, year=2023,
   if (!(year %in% 2017:2023))
     stop("'year' must be a numeric value between 2017 to 2023")
 
-  # retrieve DEM tiles from Microsoft Planetary Computer
-  items <- rstac::stac(
-    "https://planetarycomputer.microsoft.com/api/stac/v1"
-  ) |>
-    # STAC search API
-    rstac::stac_search(
-      # collection IDs to include in the search for items
-      collections = "io-lulc-annual-v02",
-      # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-      bbox = bbox,
-      # maximum number of results
-      limit = 999
-    ) |>
-    # HTTP GET requests to STAC web services
-    rstac::get_request() |>
-    # allow access assets from Microsoft's Planetary Computer
-    rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
-    # fetch all STAC Items
-    rstac::items_fetch()
+  # attempt to connect to the API
+  attempt <- 1
+  repeat {
+    # check API connectivity
+    status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
+    status <- httr::status_code(status)
+
+    if (status == 200)
+    {
+      # retrieve data from Microsoft Planetary Computer
+      items <- rstac::stac(
+        "https://planetarycomputer.microsoft.com/api/stac/v1"
+      ) |>
+        # STAC search API
+        rstac::stac_search(
+          # collection IDs to include in the search for items
+          collections = "io-lulc-annual-v02",
+          # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
+          bbox = bbox,
+          # maximum number of results
+          limit = 999
+        ) |>
+        # HTTP GET requests to STAC web services
+        rstac::get_request() |>
+        # allow access assets from Microsoft's Planetary Computer
+        rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
+        # fetch all STAC Items
+        rstac::items_fetch()
+
+      break
+    } else if (attempt >= 5) {
+      stop("Failed to connect to the API after ", 5,
+           " attempts. Last status code: ", status)
+    } else {
+      message("Attempt ", attempt, " failed with status code ", status,
+              ". Retrying in ", 2, " seconds...")
+      Sys.sleep(2)
+      attempt <- attempt + 1
+    }
+  }
+
+  # validate results
+  if (length(items$features) == 0)
+    stop("No data retrieved. Data may be unavailable for the specified area.")
 
   ids <- sapply(items$features,
                 function(o) strsplit(o$id, "-")[[1]])
 
+  message("Getting land use and land cover data:\n  tiles: ",
+          paste(unique(ids[1, ]), collapse = ", "), "\n")
+
   ok <- as.numeric(ids[2, ]) == year
   items$features <- items$features[ok]
-  # download items
-  items <- items |>
-    rstac::assets_download(asset_names="data",
-                           overwrite=TRUE,
-                           output_dir=output_dir)
 
-  # load and crop tiles
-  rdata <- lapply(items$features,
-                  function(o)
-                  {
-                    r <- terra::rast(o$assets$data$href)
-                    # project the extent to match the raster's CRS
-                    w <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
-                    w <- terra::intersect(terra::ext(r), w)
-                    terra::crop(r, w)
-                  })
+  # set temporary directory for terra
+  terra::terraOptions(tempdir = output_dir)
+  # create the progress bar
+  pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
+  icount <- 0
+  # load and process rasters
+  rdata <- lapply(items$features, function(o){
+    r <- terra::rast(o$assets$data$href)
+    # project the extent to match the raster's CRS
+    w <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+    w <- terra::intersect(terra::ext(r), w)
+    r <- terra::crop(r, w)
+    # ppdate the progress bar
+    icount <<- icount + 1
+    utils::setTxtProgressBar(pb, icount)
+    return(r)
+  })
+  cat("\n")
+
 
   if (length(rdata) == 1)
   {
@@ -179,6 +211,9 @@ get_lulc <- function(where, year=2023,
     names(rdata) <- "lulc"
     rdata <- data.frame(where, rdata)
   }
+
+  # clean up terra temporary files
+  terra::tmpFiles(remove = TRUE)
 
   return(rdata)
 }

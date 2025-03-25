@@ -131,7 +131,7 @@ get_dem <- function(where,
 
   # validate results
   if (length(items$features) == 0)
-    stop("No data retrieved. Data may be unavailable for the specified period.")
+    stop("No data retrieved. Data may be unavailable for the specified area.")
 
   message("Getting Copernicus DEM data tiles:\n  ",
           paste(unlist(lapply(items$features, function(o) o$id)),
