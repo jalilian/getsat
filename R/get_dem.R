@@ -10,8 +10,10 @@
 #'   - A matrix or data frame with two columns representing
 #'     longitude (first column) and latitude (second column) of points.
 #'     All coordinates must be in the WGS84 coordinate reference system.
+#'
 #' @param res Numeric. Resolution of the DEM data in meters.
 #'   Must be either \code{30} or \code{90}.
+#'
 #' @param output_dir Character. Directory to store the downloaded DEM tiles.
 #'   Defaults to a temporary directory.
 #'
@@ -55,6 +57,7 @@
 #' @export
 get_dem <- function(where,
                     res=30,
+                    download=FALSE,
                     output_dir=tempdir())
 {
   message("For citation and terms of use, see\n<https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM>")
@@ -113,11 +116,7 @@ get_dem <- function(where,
         # allow access assets from Microsoft's Planetary Computer
         rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
         # fetch all STAC Items
-        rstac::items_fetch() |>
-        # download items
-        rstac::assets_download(asset_names="data",
-                               overwrite=TRUE,
-                               output_dir=output_dir)
+        rstac::items_fetch()
 
       break
     } else if (attempt >= 5) {
@@ -131,15 +130,30 @@ get_dem <- function(where,
     }
   }
 
-  # load and crop DEM tiles
-  rdata <- lapply(items$features,
-                  function(o)
-                  {
-                    r <- terra::rast(o$assets$data$href)
-                    w <- terra::ext(bbox, xy=TRUE)
-                    w <- terra::intersect(terra::ext(r), w)
-                    terra::crop(r, w)
-                  })
+  # validate results
+  if (length(items$features) == 0)
+    stop("No data retrieved. Data may be unavailable for the specified period.")
+
+
+  # set temporary directory for terra
+  terra::terraOptions(tempdir = output_dir)
+  # create the progress bar
+  pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
+  icount <- 0
+  # load and process rasters
+  rdata <- lapply(items$features, function(o){
+    r <- terra::rast(o$assets$data$href)
+    w <- terra::ext(bbox, xy=TRUE)
+    w <- terra::intersect(terra::ext(r), w)
+    r <- terra::crop(r, w)
+    # ppdate the progress bar
+    icount <<- icount + 1
+    utils::setTxtProgressBar(pb, icount)
+    return(r)
+  })
+  # clean up terra temporary files
+  terra::tmpFiles(remove = TRUE)
+  cat("\n")
 
   if (length(rdata) == 1)
   {
