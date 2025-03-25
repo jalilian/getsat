@@ -68,8 +68,8 @@ get_dem <- function(where,
   } else if (inherits(where, c("matrix", "data.frame")) && ncol(where) == 2)
   {
     bbox <- c(
-      min(where[, 1]) - 0.15, min(where[, 2]) - 0.15,
-      max(where[, 1]) + 0.15, max(where[, 2]) + 0.15
+      min(where[, 1]) - 0.1, min(where[, 2]) - 0.1,
+      max(where[, 1]) + 0.1, max(where[, 2]) + 0.1
     )
   } else {
     stop("'where' must be a numeric vector of length 4 (bounding box) or a matrix/data.frame with two columns (longitude, latitude).")
@@ -153,8 +153,6 @@ get_dem <- function(where,
     utils::setTxtProgressBar(pb, icount)
     return(r)
   })
-  # clean up terra temporary files
-  terra::tmpFiles(remove = TRUE)
   cat("\n")
 
   if (length(rdata) == 1)
@@ -165,9 +163,6 @@ get_dem <- function(where,
     rdata <- do.call(terra::mosaic, c(rdata, list(fun="mean")))
   }
 
-  # projection to EPSG:4326 (World Geodetic System 1984, WGS84)
-  rdata <- terra::project(rdata, "EPSG:4326")
-
   # if 'where' is a matrix/data frame, extract elevation values for points
   if (inherits(where, c("matrix", "data.frame")))
   {
@@ -176,6 +171,9 @@ get_dem <- function(where,
     names(rdata) <- "elevation"
     rdata <- data.frame(where, rdata)
   }
+
+  # clean up terra temporary files
+  terra::tmpFiles(remove = TRUE)
 
   return(rdata)
 }
