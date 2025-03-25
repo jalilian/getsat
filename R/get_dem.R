@@ -57,7 +57,6 @@
 #' @export
 get_dem <- function(where,
                     res=30,
-                    download=FALSE,
                     output_dir=tempdir())
 {
   message("For citation and terms of use, see\n<https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM>")
@@ -134,6 +133,9 @@ get_dem <- function(where,
   if (length(items$features) == 0)
     stop("No data retrieved. Data may be unavailable for the specified period.")
 
+  message("Getting Copernicus DEM data tiles:\n  ",
+          paste(unlist(lapply(items$features, function(o) o$id)),
+                collapse = "\n  "), "\n")
 
   # set temporary directory for terra
   terra::terraOptions(tempdir = output_dir)
