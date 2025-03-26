@@ -4,13 +4,23 @@
 \alias{check_modis}
 \title{Check for MODIS Collections in Microsoft's Planetary Computer STAC API}
 \usage{
-check_modis()
+check_modis(maxattempts = 5, delay = 2)
+}
+\arguments{
+\item{maxattempts}{Integer, default is \code{5}. The maximum number of connection
+attempts before failing.}
+
+\item{delay}{Numeric, default is \code{2}. The initial delay (in seconds) between
+retries, which increases exponentially.}
 }
 \value{
 A data frame with the following columns:
+\describe{
 \item{id}{The unique identifier of the MODIS collection.}
 \item{title}{The title or name of the MODIS collection.}
+\item{description}{A brief description of the MODIS collection.}
 \item{vars}{A list of asset variable names available for each MODIS collection.}
+}
 }
 \description{
 This function connects to the Microsoft Planetary Computer's STAC API, retrieves
@@ -21,10 +31,14 @@ follow the license and terms of use from NASA and Microsoft. Failure to comply
 may result in data usage policy violations.
 }
 \details{
-The function uses the \code{rstac} package to interface with the STAC API provided by
-Microsoft's Planetary Computer. It retrieves a list of all collections and filters
-those whose \code{id} starts with "modis". It then returns a data frame containing
-the \code{id}, \code{title}, and asset variable names of the filtered collections.
+The function uses the \code{rstac} package to interface with the STAC API provided
+by Microsoft's Planetary Computer. It attempts to establish a connection up
+to a specified number of retries (\code{maxattempts}), implementing an exponential
+backoff delay (\code{delay}).
+
+Collections related to MODIS are identified based on the prefix \code{"modis"} in
+their \code{id} field. The function returns a data frame containing key metadata
+and a list of available asset variables for each MODIS collection.
 
 \strong{Important Note:}
 MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
@@ -47,7 +61,7 @@ Avilable at https://modaps.modaps.eosdis.nasa.gov/services/faq/LAADS_Data-Use_Ci
 Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 }
 \seealso{
-\link[rstac]{stac}, \link[rstac]{collections}, \link[rstac]{get_request}
+\link[getsat]{get_modis}, \link[rstac]{stac}, \link[rstac]{collections}, \link[rstac]{get_request}
 }
 \author{
 Abdollah Jalilian

@@ -7,11 +7,21 @@
 #' follow the license and terms of use from NASA and Microsoft. Failure to comply
 #' may result in data usage policy violations.
 #'
+#' @param maxattempts Integer, default is `5`. The maximum number of connection
+#'      attempts before failing.
+#'
+#' @param delay Numeric, default is `2`. The initial delay (in seconds) between
+#'      retries, which increases exponentially.
+#'
 #' @details
-#' The function uses the `rstac` package to interface with the STAC API provided by
-#' Microsoft's Planetary Computer. It retrieves a list of all collections and filters
-#' those whose `id` starts with "modis". It then returns a data frame containing
-#' the `id`, `title`, and asset variable names of the filtered collections.
+#' The function uses the `rstac` package to interface with the STAC API provided
+#' by Microsoft's Planetary Computer. It attempts to establish a connection up
+#' to a specified number of retries (`maxattempts`), implementing an exponential
+#' backoff delay (`delay`).
+#'
+#' Collections related to MODIS are identified based on the prefix `"modis"` in
+#' their `id` field. The function returns a data frame containing key metadata
+#' and a list of available asset variables for each MODIS collection.
 #'
 #' **Important Note:**
 #' MODIS data are provided by NASA LP DAAC at the USGS EROS Center (producer, licensor, processor)
@@ -20,9 +30,12 @@
 #' the data usage policies.
 #'
 #' @return A data frame with the following columns:
-#' \item{id}{The unique identifier of the MODIS collection.}
-#' \item{title}{The title or name of the MODIS collection.}
-#' \item{vars}{A list of asset variable names available for each MODIS collection.}
+#' \describe{
+#'   \item{id}{The unique identifier of the MODIS collection.}
+#'   \item{title}{The title or name of the MODIS collection.}
+#'   \item{description}{A brief description of the MODIS collection.}
+#'   \item{vars}{A list of asset variable names available for each MODIS collection.}
+#' }
 #'
 #' @examples
 #' \dontrun{
@@ -37,15 +50,15 @@
 #'
 #' Microsoft Planetary Computer. Available at https://planetarycomputer.microsoft.com/
 #'
-#' @seealso \link[rstac]{stac}, \link[rstac]{collections}, \link[rstac]{get_request}
+#' @seealso \link[getsat]{get_modis}, \link[rstac]{stac}, \link[rstac]{collections}, \link[rstac]{get_request}
 #'
 #' @author Abdollah Jalilian
 #'
 #' @export
-check_modis <- function()
+check_modis <- function(maxattempts=5, delay=2)
 {
   # attempt to connect to the API
-  for (attempt in 1:5)
+  for (attempt in 1:maxattempts)
   {
     collecs <- tryCatch(
       {
@@ -70,12 +83,12 @@ check_modis <- function()
       break # successful
 
     # exponential delay
-    Sys.sleep(1 * 2^(attempt - 1))
+    Sys.sleep(delay * 2^(attempt - 1))
     attempt <- attempt + 1
   }
 
   if (is.null(collecs))
-    stop("Failed to connect to the API after ", 5, " attempts")
+    stop("Failed to connect to the API after ", maxattempts, " attempts")
 
   # extract id, title and description of collections
   collecs_modis <- do.call(rbind, lapply(collecs$collections, function(o) {

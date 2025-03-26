@@ -36,6 +36,12 @@
 #'        - `"days"` (default), `"doy"` (day of the year)
 #'        - `"7days"`, `"10days"`, `"15days"`
 #'
+#' @param maxattempts Integer, default is `5`. The maximum number of connection
+#'      attempts before failing.
+#'
+#' @param delay Numeric, default is `2`. The initial delay (in seconds) between
+#'      retries, which increases exponentially.
+#'
 #' @param download Logical. If `TRUE`, MODIS files will be downloaded before processing.
 #'        If `FALSE` (default), data is read directly from the server without downloading.
 #'
@@ -118,6 +124,8 @@ get_modis <- function(where,
                       crop=TRUE,
                       w=NA,
                       agglevel=NULL,
+                      maxattempts=5,
+                      delay=2,
                       download=FALSE,
                       output_dir=tempdir(),
                       clean_dir=FALSE)
@@ -192,7 +200,7 @@ get_modis <- function(where,
 
   # attempt to connect to the API
   message("Connecting to the Microsoft Planetary Computer STAC API...\n")
-  for (attempt in 1:5)
+  for (attempt in 1:maxattempts)
   {
     items <- tryCatch(
       {
@@ -228,12 +236,12 @@ get_modis <- function(where,
       break # successful
 
     # exponential delay
-    Sys.sleep(1 * 2^(attempt - 1))
+    Sys.sleep(delay * 2^(attempt - 1))
     attempt <- attempt + 1
   }
 
   if (is.null(items))
-    stop("Failed to connect to the API after ", 5, " attempts")
+    stop("Failed to connect to the API after ", maxattempts, " attempts")
 
   # validate results
   if (length(items$features) == 0)

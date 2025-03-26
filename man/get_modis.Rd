@@ -12,6 +12,8 @@ get_modis(
   crop = TRUE,
   w = NA,
   agglevel = NULL,
+  maxattempts = 5,
+  delay = 2,
   download = FALSE,
   output_dir = tempdir(),
   clean_dir = FALSE
@@ -46,6 +48,12 @@ in the \code{terra} package. Available options include:
 - \code{"weeks"} (ISO 8601 week number), \code{"yearweeks"}
 - \code{"days"} (default), \code{"doy"} (day of the year)
 - \code{"7days"}, \code{"10days"}, \code{"15days"}}
+
+\item{maxattempts}{Integer, default is \code{5}. The maximum number of connection
+attempts before failing.}
+
+\item{delay}{Numeric, default is \code{2}. The initial delay (in seconds) between
+retries, which increases exponentially.}
 
 \item{download}{Logical. If \code{TRUE}, MODIS files will be downloaded before processing.
 If \code{FALSE} (default), data is read directly from the server without downloading.}
