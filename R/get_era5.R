@@ -10,6 +10,18 @@
 #'
 #' @param key A character string representing the ECMWF API key associated with your user account.
 #'
+#' @param where Either:
+#'   - A numeric vector of length 4 defining the bounding box for the region of
+#'     interest, in the longitude/latitude format `c(North, West, South, East)`.
+#'     Coordinates must fall within:
+#'             - North: 90.0° N
+#'             - South: -90.0° N
+#'             - West: -180.0° W
+#'             - East: 180.0° W
+#'   - A matrix or data frame with two columns representing
+#'     longitude (first column) and latitude (second column) of points.
+#'     All coordinates must be in the WGS84 coordinate reference system.
+#'
 #' @param vars A character vector specifying the land surface variables to retrieve. Supported values include:
 #' \itemize{
 #'   \item "2m_dewpoint_temperature", "2m_temperature", "skin_temperature"
@@ -24,18 +36,6 @@
 #'   \item "leaf_area_index_high_vegetation", "leaf_area_index_low_vegetation", "high_vegetation_cover", "low_vegetation_cover"
 #'   \item "lake_total_depth", "land_sea_mask", "soil_type", "type_of_high_vegetation", "type_of_low_vegetation"
 #' }
-#'
-#' @param where Either:
-#'   - A numeric vector of length 4 defining the bounding box for the region of
-#'     interest, in the longitude/latitude format `c(North, West, South, East)`.
-#'     Coordinates must fall within:
-#'             - North: 90.0° N
-#'             - South: -90.0° N
-#'             - West: -180.0° W
-#'             - East: 180.0° W
-#'   - A matrix or data frame with two columns representing
-#'     longitude (first column) and latitude (second column) of points.
-#'     All coordinates must be in the WGS84 coordinate reference system.
 #'
 #' @param year A numeric value specifying the year to retrieve data for (from 1950 onwards).
 #'
@@ -97,15 +97,16 @@
 #' key <- "********************************"
 #'
 #' # Download skin temperature data for 6th of October 2022
-#' st1 <- get_era5_land(key, vars = "skin_temperature", where = area,
+#' st1 <- get_era5_land(key, where = area, vars = "skin_temperature",
 #'                     year = 2022, month = 10, day=6)
 #'
 #' # Plot the retrieved data
 #' plot(st1)
 #'
 #' # Download skin and 2 meter temperature data for 6th and 7th of October 2022
-#' st2 <- get_era5_land(key, vars = c("skin_temperature", "2m_temperature"),
+#' st2 <- get_era5_land(key,
 #'                      where = cbind(runif(100, 6, 18), runif(100, 36, 47)),
+#'                      vars = c("skin_temperature", "2m_temperature"),
 #'                      year = 2022, month = 10, day=6:7)
 #' print(st2)
 #' }
@@ -121,8 +122,8 @@
 #'
 #' @export
 get_era5_land <- function(key,
-                          vars,
                           where,
+                          vars,
                           year,
                           month = NULL,
                           day = NULL,
