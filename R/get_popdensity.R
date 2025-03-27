@@ -149,7 +149,7 @@ get_popdensity <- function(where,
             "1) enter your NASA Earthdata username and password for authentication\n   ",
             "2) make sure the downloaded file is in the directory: ",
             downloaddir, "\n")
-    cat("If the download is complete, press Enter to continue...\n")
+    cat("If the download is completed, press Enter to continue...\n")
     readline()
   }
 
@@ -159,7 +159,7 @@ get_popdensity <- function(where,
          zipfilename)
 
   # extraction directory for the downloaded zip file
-  exdir <- paste0(downloaddir, "popdensity/")
+  exdir <- paste0(downloaddir, "popdensity", year, res, "/")
   if (!dir.exists(exdir))
     dir.create(exdir)
 
@@ -168,8 +168,6 @@ get_popdensity <- function(where,
 
   # load raster data
   rdata <- terra::rast(list.files(exdir, pattern = "\\.tif$", full.names = TRUE))
-  w <- terra::ext(c(bbox[1], bbox[3], bbox[2], bbox[4]))
-  rdata <- terra::crop(rdata, w)
 
   # if 'where' is a matrix/data frame, extract pop-density values for points
   if (inherits(where, c("matrix", "data.frame")))
@@ -177,6 +175,9 @@ get_popdensity <- function(where,
     where <- data.frame(where)
     rdata <- terra::extract(rdata, where, ID=FALSE)
     rdata <- cbind(where, rdata)
+  } else{
+    w <- terra::ext(c(bbox[1], bbox[3], bbox[2], bbox[4]))
+    rdata <- terra::crop(rdata, w)
   }
 
   return(rdata)
