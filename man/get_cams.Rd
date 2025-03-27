@@ -12,7 +12,7 @@ get_cams(
   month = 1:12,
   level = "0",
   agglevel = "days",
-  temp_dir = NULL
+  tempdir = tempdir()
 )
 }
 \arguments{
@@ -82,8 +82,8 @@ Available options:
 \item "7days", "10days", "15days"
 }}
 
-\item{temp_dir}{A character string specifying a temporary directory for downloaded files.
-If \code{NULL} (default), the system's temporary directory (\code{tempdir()}) is used.}
+\item{tempdir}{A character string specifying a temporary directory for downloaded files.
+If not specified (default), the system's temporary directory (\code{tempdir()}) is used.}
 }
 \value{
 If \code{where} is a bounding box (vector of length four), a \code{SpatRaster} object

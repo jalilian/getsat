@@ -69,8 +69,8 @@
 #'   - "days" (default), "doy" (day of the year)
 #'   - "7days", "10days", "15days"
 #'
-#' @param temp_dir A character string specifying a temporary directory for downloaded files.
-#'   If `NULL` (default), the system's temporary directory (`tempdir()`) is used.
+#' @param tempdir A character string specifying a temporary directory for downloaded files.
+#'   If not specified (default), the system's temporary directory (`tempdir()`) is used.
 #'
 #' @return If `where` is a bounding box (vector of length four), a `SpatRaster` object
 #'   (or a list of them) representing the selected air quality variables. If `where` is
@@ -128,7 +128,7 @@ get_cams <- function(key,
                      month = 1:12,
                      level = "0",
                      agglevel="days",
-                     temp_dir = NULL)
+                     tempdir = tempdir())
 {
   message("For citation and terms of use, see\n<https://ads.atmosphere.copernicus.eu>\n<https://www.ecmwf.int/>")
 
@@ -196,13 +196,6 @@ get_cams <- function(key,
   user <- "ecmwfr"
   ecmwfr::wf_set_key(key = key, user = user)
 
-  # create a temporary directory to downloaded and extract files
-  if (is.null(temp_dir))
-    temp_dir <- tempdir()
-  if (!dir.exists(temp_dir))
-  {
-    dir.create(temp_dir)
-  }
 
   # Define output filename
   dfile <- paste0("cams_europe_", year, "_", month, ".zip")
@@ -238,19 +231,19 @@ get_cams <- function(key,
     user = user,
     request = request,
     transfer = TRUE,
-    path = temp_dir,
+    path = tempdir,
     time_out = 3 * 60 * 60,
     verbose = TRUE
   )
 
   # unzip downloaded file
   zfiles <- utils::unzip(out_file, list=TRUE)
-  utils::unzip(out_file, exdir=temp_dir)
+  utils::unzip(out_file, exdir=tempdir)
 
   # create a SpatRaster object from the downloaded data file
   rdata <- lapply(
     zfiles$Name,
-    function(o) terra::rast(file.path(temp_dir, o))
+    function(o) terra::rast(file.path(tempdir, o))
   )
 
   # perform temporal aggregation if specified

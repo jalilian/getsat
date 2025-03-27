@@ -13,7 +13,7 @@ get_era5_land(
   day = NULL,
   time = NULL,
   agglevel = "days",
-  temp_dir = NULL
+  tempdir = tempdir()
 )
 }
 \arguments{
@@ -77,8 +77,8 @@ Options are:
 \item \code{"15days"}
 }}
 
-\item{temp_dir}{A character string specifying a temporary directory for downloaded
-and extracted files. If \code{NULL} (default), the system's temporary directory
+\item{tempdir}{A character string specifying a temporary directory for downloaded
+and extracted files. If not specified (default), the system's temporary directory
 (\code{tempdir()}) is used.}
 }
 \value{

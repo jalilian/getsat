@@ -66,8 +66,8 @@
 #'       \item `"15days"`
 #'     }
 #'
-#' @param temp_dir A character string specifying a temporary directory for downloaded
-#'   and extracted files. If `NULL` (default), the system's temporary directory
+#' @param tempdir A character string specifying a temporary directory for downloaded
+#'   and extracted files. If not specified (default), the system's temporary directory
 #'   (`tempdir()`) is used.
 #'
 #' @return If `where` is a bounding box (numeric vector of length four),
@@ -128,7 +128,7 @@ get_era5_land <- function(key,
                           day = NULL,
                           time = NULL,
                           agglevel="days",
-                          temp_dir = NULL)
+                          tempdir = tempdir())
 {
   message("For citation and terms of use, see\n<https://cds.climate.copernicus.eu>\n<https://www.ecmwf.int/>")
 
@@ -254,14 +254,6 @@ get_era5_land <- function(key,
   user <- "ecmwfr"
   ecmwfr::wf_set_key(key = key, user = user)
 
-  # create a temporary directory to downloaded and extract files
-  if (is.null(temp_dir))
-    temp_dir <- tempdir()
-  if (!dir.exists(temp_dir))
-  {
-    dir.create(temp_dir)
-  }
-
   # Define output filename
   dfile <- paste0("era5_hourly_", year, "_", month, ".zip")
 
@@ -293,7 +285,7 @@ get_era5_land <- function(key,
     user = user,
     request = request,
     transfer = TRUE,
-    path = temp_dir,
+    path = tempdir,
     time_out = 3 * 60 * 60,
     verbose = TRUE
   )
