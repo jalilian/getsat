@@ -149,6 +149,8 @@ get_popdensity <- function(where,
             "1) enter your NASA Earthdata username and password for authentication\n   ",
             "2) make sure the downloaded file is in the directory: ",
             downloaddir, "\n")
+    cat("If the download is complete, press Enter to continue...\n")
+    readline()
   }
 
   # check successful download and correct path
