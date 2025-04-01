@@ -13,7 +13,7 @@ get_era5_land(
   day = NULL,
   time = NULL,
   agglevel = "days",
-  tempdir = tempdir()
+  tempdir = NULL
 )
 }
 \arguments{
