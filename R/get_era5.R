@@ -129,9 +129,11 @@ get_era5_land <- function(key,
                           day = NULL,
                           time = NULL,
                           agglevel="days",
-                          tempdir = tempdir())
+                          tempdir = NULL)
 {
-  message("For citation and terms of use, see\n<https://cds.climate.copernicus.eu>\n<https://www.ecmwf.int/>")
+  message(paste0("For citation and terms of use, see\n",
+                 "   <https://cds.climate.copernicus.eu>\n",
+                 "   <https://www.ecmwf.int/en/terms-use>\n"))
 
   # ERA5-Land climate variables
   c_vars <- c(
@@ -220,15 +222,26 @@ get_era5_land <- function(key,
     stop("Area must be in the format c(North, West, South, East) with valid coordinates.")
 
   # validate the year
-  if (any(year < 1940))
-    stop("Data is only available form January 1940")
+  if (!is.numeric(year))
+  {
+    stop("Error: 'year' must be a numeric value.")
+  } else{
+    if (any(year < 1940))
+      stop("Data is only available form January 1940")
+    currentyear <- as.numeric(format(Sys.Date(), "%Y"))
+    if (year > currentyear)
+      stop(paste0("Error: 'year' cannot be greater than the current year (",
+                 currentyear, ")."))
+  }
 
   # validate the month
   valid_months <- sprintf("%02d", 1:12)
   if (is.null(month))
+  {
     month <- valid_months
-  else
+  } else{
     month <- sprintf("%02d", month)
+  }
   if (!all(month %in% valid_months))
     stop("Invalid value(s) in 'month'. Allowed values are: ",
          paste(valid_months, collapse = ", "))
@@ -236,9 +249,11 @@ get_era5_land <- function(key,
   # validate the day
   valid_days <- sprintf("%02d", 1:31)
   if (is.null(day))
+  {
     day <- valid_days
-  else
+  } else{
     day <- sprintf("%02d", day)
+  }
   if (!all(day %in% valid_days))
     stop("Invalid value(s) in 'day'. Allowed values are: ",
          paste(valid_days, collapse = ", "))
@@ -250,6 +265,10 @@ get_era5_land <- function(key,
   if (!all(time %in% valid_times))
     stop("Invalid value(s) in 'time'. Allowed values are: ",
          paste(valid_times, collapse = ", "))
+
+  # set tempdir
+  if (is.null(tempdir))
+    tempdir <- tempdir()
 
   # set ECMWF authentication
   user <- "ecmwfr"
@@ -279,15 +298,18 @@ get_era5_land <- function(key,
   )
 
   # Validate request and credentials
-  ecmwfr::wf_check_request(request = request)
+  message(paste(utils::capture.output(
+    ecmwfr::wf_check_request(request = request)),
+    collapse="\n"))
 
   # Download data
   out_file <- ecmwfr::wf_request(
-    user = user,
     request = request,
+    user = user,
     transfer = TRUE,
     path = tempdir,
     time_out = 3 * 60 * 60,
+    retry = 30,
     verbose = TRUE
   )
 
