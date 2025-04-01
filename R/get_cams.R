@@ -128,9 +128,11 @@ get_cams <- function(key,
                      month = 1:12,
                      level = "0",
                      agglevel="days",
-                     tempdir = tempdir())
+                     tempdir = NULL)
 {
-  message("For citation and terms of use, see\n<https://ads.atmosphere.copernicus.eu>\n<https://www.ecmwf.int/>")
+  message(paste0("For citation and terms of use, see\n",
+                 "   <https://ads.atmosphere.copernicus.eu>\n",
+                 "   <https://www.ecmwf.int/en/terms-use>\n"))
 
   # air quality variables
   aq_vars <- c(
@@ -192,6 +194,10 @@ get_cams <- function(key,
                  # Forecast data
                  "interim_reanalysis")
 
+  # set tempdir
+  if (is.null(tempdir))
+    tempdir <- tempdir()
+
   # set ECMWF authentication
   user <- "ecmwfr"
   ecmwfr::wf_set_key(key = key, user = user)
@@ -223,16 +229,19 @@ get_cams <- function(key,
     target = dfile
   )
 
-  # Validate request and credentials
-  ecmwfr::wf_check_request(request = request)
+  # validate request and credentials
+  message(paste(utils::capture.output(
+    ecmwfr::wf_check_request(request = request)),
+    collapse="\n"))
 
-  # Download data
+  # download data
   out_file <- ecmwfr::wf_request(
-    user = user,
     request = request,
+    user = user,
     transfer = TRUE,
     path = tempdir,
     time_out = 3 * 60 * 60,
+    retry = 30,
     verbose = TRUE
   )
 

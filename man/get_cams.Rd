@@ -12,7 +12,7 @@ get_cams(
   month = 1:12,
   level = "0",
   agglevel = "days",
-  tempdir = tempdir()
+  tempdir = NULL
 )
 }
 \arguments{

@@ -297,12 +297,12 @@ get_era5_land <- function(key,
     target = dfile
   )
 
-  # Validate request and credentials
+  # validate request and credentials
   message(paste(utils::capture.output(
     ecmwfr::wf_check_request(request = request)),
     collapse="\n"))
 
-  # Download data
+  # download data
   out_file <- ecmwfr::wf_request(
     request = request,
     user = user,
