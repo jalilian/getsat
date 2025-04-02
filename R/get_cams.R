@@ -210,7 +210,6 @@ get_cams <- function(key,
   user <- "ecmwfr"
   ecmwfr::wf_set_key(key = key, user = user)
 
-
   # Define output filename
   dfile <- paste0("cams_europe_", year, "_", month, ".zip")
 
@@ -288,6 +287,11 @@ get_cams <- function(key,
       function(o) terra::tapp(o, index=agglevel, fun="mean")
     )
 
+  # If only one variable, simplify the output
+  if (length(rdata) == 1)
+    rdata <- rdata[[1]]
+  else
+    names(rdata) <- vars
 
   # if 'where' is a matrix/data frame, extract elevation values for points
   if (inherits(where, c("matrix", "data.frame")))
@@ -298,12 +302,6 @@ get_cams <- function(key,
       data.frame(where, out)
     })
   }
-
-  # If only one variable, simplify the output
-  if (length(rdata) == 1)
-    rdata <- rdata[[1]]
-  else
-    names(rdata) <- vars
 
   return(rdata)
 }
