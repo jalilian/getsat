@@ -13,6 +13,8 @@ get_era5_land(
   day = NULL,
   time = NULL,
   agglevel = "days",
+  maxattempts = 5,
+  delay = 2,
   tempdir = NULL
 )
 }
@@ -76,6 +78,12 @@ Options are:
 \item \code{"10days"}
 \item \code{"15days"}
 }}
+
+\item{maxattempts}{Integer, default is \code{5}. The maximum number of connection
+attempts before failing.}
+
+\item{delay}{Numeric, default is \code{2}. The initial delay (in seconds) between
+retries, which increases exponentially.}
 
 \item{tempdir}{A character string specifying a temporary directory for downloaded
 and extracted files. If not specified (default), the system's temporary directory

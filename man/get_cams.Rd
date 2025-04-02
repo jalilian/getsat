@@ -12,6 +12,8 @@ get_cams(
   month = 1:12,
   level = "0",
   agglevel = "days",
+  maxattempts = 5,
+  delay = 2,
   tempdir = NULL
 )
 }
@@ -81,6 +83,12 @@ Available options:
 \item "days" (default), "doy" (day of the year)
 \item "7days", "10days", "15days"
 }}
+
+\item{maxattempts}{Integer, default is \code{5}. The maximum number of connection
+attempts before failing.}
+
+\item{delay}{Numeric, default is \code{2}. The initial delay (in seconds) between
+retries, which increases exponentially.}
 
 \item{tempdir}{A character string specifying a temporary directory for downloaded files.
 If not specified (default), the system's temporary directory (\code{tempdir()}) is used.}

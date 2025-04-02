@@ -69,6 +69,12 @@
 #'   - "days" (default), "doy" (day of the year)
 #'   - "7days", "10days", "15days"
 #'
+#' @param maxattempts Integer, default is `5`. The maximum number of connection
+#'      attempts before failing.
+#'
+#' @param delay Numeric, default is `2`. The initial delay (in seconds) between
+#'      retries, which increases exponentially.
+#'
 #' @param tempdir A character string specifying a temporary directory for downloaded files.
 #'   If not specified (default), the system's temporary directory (`tempdir()`) is used.
 #'
@@ -128,6 +134,8 @@ get_cams <- function(key,
                      month = 1:12,
                      level = "0",
                      agglevel="days",
+                     maxattempts=5,
+                     delay=2,
                      tempdir = NULL)
 {
   message(paste0("For citation and terms of use, see\n",
@@ -235,15 +243,33 @@ get_cams <- function(key,
     collapse="\n"))
 
   # download data
-  out_file <- ecmwfr::wf_request(
-    request = request,
-    user = user,
-    transfer = TRUE,
-    path = tempdir,
-    time_out = 3 * 60 * 60,
-    retry = 30,
-    verbose = TRUE
-  )
+  for (attempt in 1:maxattempts)
+  {
+    out_file <- tryCatch({
+      ecmwfr::wf_request(
+        request = request,
+        user = user,
+        transfer = TRUE,
+        path = tempdir,
+        time_out = 3 * 60 * 60,
+        retry = 30,
+        verbose = TRUE)
+    }, error = function(e) {
+      message(sprintf("Attempt %d failed: %s", attempt, e$message))
+      return(NULL)
+    })
+
+    if (!is.null(out_file))
+      break # successful
+
+    # exponential delay
+    Sys.sleep(delay * 2^(attempt - 1))
+    attempt <- attempt + 1
+  }
+
+  # validate the downloaded file
+  if (is.null(out_file))
+    stop("No data retrieved.")
 
   # unzip downloaded file
   zfiles <- utils::unzip(out_file, list=TRUE)
