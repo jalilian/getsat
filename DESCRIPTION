@@ -24,7 +24,8 @@ Imports:
     ecmwfr,
     rstac,
     terra,
-    httr
+    httr,
+    ncdf4
 Suggests:
     knitr,
     rmarkdown
