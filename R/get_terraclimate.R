@@ -96,8 +96,15 @@ get_terraclimate <- function(where,
   if (any(bbox[1] < -180 | bbox[3] > 180 | bbox[2] < -90 | bbox[4] > 90))
     stop("Bounding box coordinates are outside valid ranges.")
 
+  # Validate 'var'
   if (!is.character(var) || length(var) != 1)
     stop("'var' must be a single character string.")
+
+  allowed_vars <- c("aet", "def", "pet", "ppt", "q", "soil", "srad",
+                    "swe", "tmax", "tmin", "vap", "vpd", "ws", "PDSI")
+  if (!(var %in% allowed_vars))
+    stop(sprintf("'var' must be one of: %s",
+                 paste(allowed_vars, collapse = ", ")))
 
   message("Connecting to the server to download TerraClimate data...\n")
   url <- paste0("http://thredds.northwestknowledge.net:8080/thredds/dodsC/",
