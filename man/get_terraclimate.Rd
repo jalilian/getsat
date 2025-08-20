@@ -47,9 +47,21 @@ coordinates and corresponding values.
 \description{
 Downloads and returns TerraClimate data, a high-resolution global dataset
 of monthly climate and water balance variables from 1958 to the present.
-These data are useful for ecological, hydrological, and climate studies.
-The spatial resolution is approximately 4 km (1/24°), and all variables
-have monthly temporal resolution.
+The dataset is widely used for ecological, hydrological, and climate studies.
+It has a spatial resolution of ~4 km (1/24°) and monthly temporal resolution.
+Data are accessed via the Northwest Knowledge Network (NKN) and are publicly
+available under the Creative Commons Public Domain Dedication (CC0).
+}
+\details{
+TerraClimate is a high-resolution global dataset of monthly climate
+and water balance variables covering terrestrial surfaces from 1958
+to the present. It is maintained by the Climatology Lab at the
+University of California, Merced, led by Professor John T. Abatzoglou,
+and is designed to support research and practical applications
+in environmental management, agriculture, and water resources.
+Data access is provided through the Northwest Knowledge Network
+(University of Idaho) via their THREDDS Data Server:
+\url{https://climate.northwestknowledge.net/TERRACLIMATE/}.
 }
 \examples{
 \dontrun{

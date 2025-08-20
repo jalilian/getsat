@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
 # getsat: Retrieving Commonly Used Satellite Data
 
 <!-- badges: start -->
+[![R Build Status](https://github.com/jalilian/getsat/workflows/R-CMD-check/badge.svg)](https://github.com/jalilian/getsat/actions)
 <!-- badges: end -->
 
 `getsat` is an R package designed to simplify access to commonly used satellite data on environmental variables. It provides an easy way to retrieve, process, and integrate satellite-based data from sources such as:
@@ -21,6 +22,7 @@ knitr::opts_chunk$set(
 - [Copernicus Climate Data Store](https://cds.climate.copernicus.eu)
 - [Copernicus Atmosphere Data Store](https://ads.atmosphere.copernicus.eu)
 - [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com)
+- [Climatology Lab](https://www.climatologylab.org/terraclimate.html)
 
 Please note that users must acknowledge the original data sources appropriately. Any use of data from these platforms requires clear and visible attribution, including proper citation and referencing of the datasets, as specified by their licenses and terms of use.
 
