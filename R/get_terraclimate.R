@@ -14,20 +14,20 @@
 #' @param var Character string specifying the TerraClimate variable to retrieve.
 #'        Supported values include:
 #'        \describe{
-#'     \item{\code{"aet"}}{Actual Evapotranspiration (monthly total)}
-#'     \item{\code{"def"}}{Climate Water Deficit (monthly total)}
-#'     \item{\code{"pet"}}{Potential Evapotranspiration (monthly total; reference evapotranspiration)}
-#'     \item{\code{"ppt"}}{Precipitation (monthly total)}
-#'     \item{\code{"q"}}{Runoff (monthly total)}
-#'     \item{\code{"soil"}}{Soil Moisture (total column, end of month)}
-#'     \item{\code{"srad"}}{Downward Surface Shortwave Radiation (monthly mean)}
-#'     \item{\code{"swe"}}{Snow Water Equivalent (end of month)}
-#'     \item{\code{"tmax"}}{Maximum Temperature (monthly average)}
-#'     \item{\code{"tmin"}}{Minimum Temperature (monthly average)}
-#'     \item{\code{"vap"}}{Vapor Pressure (monthly average)}
-#'     \item{\code{"vpd"}}{Vapor Pressure Deficit (monthly average)}
-#'     \item{\code{"ws"}}{Wind Speed (monthly average)}
-#'     \item{\code{"PDSI"}}{Palmer Drought Severity Index (end of month)}
+#'     \item{\code{"aet"}}{Actual Evapotranspiration (monthly total; mm)}
+#'     \item{\code{"def"}}{Climate Water Deficit (monthly total; mm)}
+#'     \item{\code{"pet"}}{Potential Evapotranspiration (monthly total; mm)}
+#'     \item{\code{"ppt"}}{Precipitation (monthly total; mm)}
+#'     \item{\code{"q"}}{Runoff (monthly total; mm)}
+#'     \item{\code{"soil"}}{Soil Moisture (total column, end of month; mm)}
+#'     \item{\code{"srad"}}{Downward Surface Shortwave Radiation (monthly mean; W m^-2)}
+#'     \item{\code{"swe"}}{Snow Water Equivalent (end of month; mm)}
+#'     \item{\code{"tmax"}}{Maximum Temperature (monthly average; °C)}
+#'     \item{\code{"tmin"}}{Minimum Temperature (monthly average; °C)}
+#'     \item{\code{"vap"}}{Vapor Pressure (monthly average; kPa)}
+#'     \item{\code{"vpd"}}{Vapor Pressure Deficit (monthly average; kPa)}
+#'     \item{\code{"ws"}}{Wind Speed (monthly average; m s^-1)}
+#'     \item{\code{"PDSI"}}{Palmer Drought Severity Index (end of month; unitless)}
 #'   }
 #' @param maxattempts Integer, default `5`. Maximum number of attempts to connect
 #'        to the server before failing.
