@@ -1,0 +1,219 @@
+#' Retrieve 300m Annual ESA Climate Change Land Cover from 1992 to 2020
+#'
+#' This function retrieves global land cover maps derived from ESA Climate Change
+#' Initiative (CCI) Land Cover dataset at a 300m resolution for the years 1992-2020.
+#' The land cover classes are defined using the United Nations Food and Agriculture
+#' Organization's (UN FAO) Land Cover Classification System (LCCS).
+#' Please follow the license and terms of use from ESA Climate Change Initiative (providor)
+#' and Microsoft Planetary Computer (host). Failure to comply may result in data
+#' usage policy violations.
+#'
+#' @param where A numeric vector of length 4 representing the bounding box in the
+#'        form c(xmin, ymin, xmax, ymax) or a matrix/data.frame with two columns
+#'      (longitude, latitude) representing points of interest.
+#' @param year A numeric value specifying the year of interest (default is 2020).
+#'        Valid values are between 1992 and 2020.
+#' @param labels A logical value indicating whether to return land use and land
+#'        cover class names (default is FALSE). If TRUE, the function returns
+#'        descriptive labels for each class.
+#' @param fact A numeric factor for aggregation. If greater than 0, the output raster
+#'        will be aggregated by the specified factor using the modal function.
+#' @param output_dir A character string specifying the output directory for storing
+#'        downloaded data (default is a temporary directory).
+#' @param clean_dir A logical value indicating whether to clean up the output
+#' directory after the function has completed (default is FALSE).
+#'
+#' @return A raster or data frame containing the land use and land cover data for
+#'         the specified area and year. If `where` is a matrix or data frame, the
+#'         function returns a data frame with coordinates and corresponding LULC values.
+#'
+#' @details
+#' The function first validates the input, including the `where` parameter
+#'  (bounding box or coordinates) and the `year` parameter. It then uses the Microsoft
+#'  Planetary Computer's STAC API to search and download LULC data tiles, which are
+#'  cropped to the specified bounding box. The function returns a raster object with
+#'  merged LULC data or a data frame with LULC values for the specified coordinates.
+#'
+#' The LULC classes are represented by integer values:
+#' - 0: No Data
+#' - 1: Water
+#' - 2: Trees
+#' - 4: Flooded vegetation
+#' - 5: Crops
+#' - 7: Built area
+#' - 8: Bare ground
+#' - 9: Snow/ice
+#' - 10: Clouds
+#' - 11: Rangeland
+#'
+#' **Important Note:**
+#' This dataset is produced by Impact Observatory (processor, producer, licensor),
+#' Microsoft (host), and Esri (licensor). Users are required to follow the
+#' license and terms of use specified by Impact Observatory and Esri.
+#' Failure to do so may violate the data usage policies.
+#'
+#' @examples
+#' \dontrun{
+#' # Retrieve land cover for a bounding box in 2020 and include class labels
+#' lulc_data <- get_lccs(c(47, 34, 47.5, 35), year = 2020, labels = TRUE)
+#'
+#' # Retrieve LULC for a set of coordinates with aggregation
+#' coordinates <- data.frame(lon = runif(50, 47, 47.5), lat=runif(50, 34, 35))
+#' lulc_data <- get_lccs(coordinates, year = 2020, fact = 2)
+#' }
+#'
+#' @seealso \link[terra]{rast}, \link[terra]{focal}
+#'
+#' @references
+#' -Impact Observatory, Microsoft, and Esri. (2023). Global Land Use Land Cover (LULC) Dataset, 10m Resolution (2017-2023).
+#' - ESA Sentinel-2 Imagery. Available at: https://planetarycomputer.microsoft.com/
+#'
+#' @author Abdollah Jalilian
+#'
+#' @export
+get_lccs <- function(where, year=2020,
+                     labels=FALSE, fact=0,
+                     output_dir=tempdir(),
+                     clean_dir=FALSE)
+{
+  message("For citation and terms of use, see\n<https://planetarycomputer.microsoft.com/dataset/esa-cci-lc>")
+
+  # validate input: bounding box or coordinate matrix/data frame
+  if (is.numeric(where) && length(where) == 4)
+  {
+    bbox <- where
+  } else if (inherits(where, c("matrix", "data.frame")) && ncol(where) == 2)
+  {
+    bbox <- c(
+      min(where[, 1]) - 0.15, min(where[, 2]) - 0.15,
+      max(where[, 1]) + 0.15, max(where[, 2]) + 0.15
+    )
+  } else {
+    stop("'where' must be a numeric vector of length 4 (bounding box) or a matrix/data.frame with two columns (longitude, latitude).")
+  }
+
+  # validate bounding box format
+  if (bbox[1] >= bbox[3] || bbox[2] >= bbox[4])
+    stop("Bounding box must be in the format c(xmin, ymin, xmax, ymax) with valid coordinates.")
+
+  # validate year
+  if (!(year %in% 1992:2020))
+    stop("'year' must be a numeric value between 1992 to 2020")
+
+  # attempt to connect to the API
+  attempt <- 1
+  repeat {
+    # check API connectivity
+    status <- httr::GET("https://planetarycomputer.microsoft.com/api/stac/v1")
+    status <- httr::status_code(status)
+
+    if (status == 200)
+    {
+      # retrieve data from Microsoft Planetary Computer
+      items <- rstac::stac(
+        "https://planetarycomputer.microsoft.com/api/stac/v1"
+      ) |>
+        # STAC search API
+        rstac::stac_search(
+          # collection IDs to include in the search for items
+          collections = "esa-cci-lc",
+          # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
+          bbox = bbox,
+          # maximum number of results
+          limit = 999
+        ) |>
+        # HTTP GET requests to STAC web services
+        rstac::get_request() |>
+        # allow access assets from Microsoft's Planetary Computer
+        rstac::items_sign(sign_fn=rstac::sign_planetary_computer()) |>
+        # fetch all STAC Items
+        rstac::items_fetch()
+
+      break
+    } else if (attempt >= 5) {
+      stop("Failed to connect to the API after ", 5,
+           " attempts. Last status code: ", status)
+    } else {
+      message("Attempt ", attempt, " failed with status code ", status,
+              ". Retrying in ", 2, " seconds...")
+      Sys.sleep(2)
+      attempt <- attempt + 1
+    }
+  }
+
+  # validate results
+  if (length(items$features) == 0)
+    stop("No data retrieved. Data may be unavailable for the specified area.")
+
+  ids <- sapply(items$features,
+                function(o) strsplit(o$id, "-")[[1]])
+
+  message("Getting land use and land cover data:\n  tiles: ",
+          paste(unique(ids[1, ]), collapse = ", "), "\n")
+
+  ok <- as.numeric(ids[2, ]) == year
+  items$features <- items$features[ok]
+
+  # set temporary directory for terra
+  terra::terraOptions(tempdir = output_dir)
+  # create the progress bar
+  pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
+  icount <- 0
+  # load and process rasters
+  rdata <- lapply(items$features, function(o){
+    r <- terra::rast(o$assets$data$href)
+    # project the extent to match the raster's CRS
+    w <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+    w <- terra::intersect(terra::ext(r), w)
+    r <- terra::crop(r, w)
+    # ppdate the progress bar
+    icount <<- icount + 1
+    utils::setTxtProgressBar(pb, icount)
+    return(r)
+  })
+  cat("\n")
+
+
+  if (length(rdata) == 1)
+  {
+    rdata <- rdata[[1]]
+  } else{
+    # merge raster tiles into a single raster,  if more than one tile
+    rdata <- do.call(terra::mosaic, c(rdata, list(fun="modal")))
+  }
+
+  # if 'labels' argument is TRUE, return class names
+  if (labels)
+  {
+    # land cover classification levels
+    levs <- c("Water", "Trees", NA, "Flooded vegetation",
+              "Crops", NA, "Built area", "Bare ground",
+              "Snow/ice", "Clouds", "Rangeland")
+    v <- terra::values(rdata)
+    # non-finite or integer values to NA
+    v[(!is.finite(v))] <- NA
+    v[v %% 1 != 0] <- NA
+    terra::values(rdata) <- levs[v]
+  }
+
+  # aggregation if factor 'fact' is greater than 0
+  if (fact > 0)
+    rdata <- terra::aggregate(rdata, fact=fact, fun="modal", na.rm=TRUE)
+
+  # projection to EPSG:4326 (World Geodetic System 1984, WGS84)
+  rdata <- terra::project(rdata, "EPSG:4326")
+
+  # if 'where' is a matrix/data frame, extract elevation values for points
+  if (inherits(where, c("matrix", "data.frame")))
+  {
+    where <- data.frame(where)
+    rdata <- terra::extract(rdata, where, ID=FALSE)
+    names(rdata) <- "lulc"
+    rdata <- data.frame(where, rdata)
+  }
+
+  # clean up terra temporary files
+  terra::tmpFiles(remove = TRUE)
+
+  return(rdata)
+}
