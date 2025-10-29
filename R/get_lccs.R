@@ -1,4 +1,4 @@
-#'' Retrieve 300m Annual ESA CCI Land Cover (1992–2020)
+#' Retrieve 300m Annual ESA CCI Land Cover (1992–2020)
 #'
 #' Downloads and subsets global land cover maps from the ESA Climate Change
 #' Initiative (CCI) Land Cover dataset at 300m resolution for the years 1992–2020.
@@ -105,8 +105,8 @@ get_lccs <- function(where, year=2020,
 
   message("Connecting to the CEDA server to download land cover CCI data...\n")
   url <- paste0("https://dap.ceda.ac.uk/thredds/dodsC/neodc/esacci/land_cover/",
-                "data/pft/v2.0.8/ESACCI-LC-L4-PFT-Map-300m-P1Y-",
-                year, "-v2.0.8.nc")
+                "data/pft/v2.0.81/ESACCI-LC-L4-PFT-Map-300m-P1Y-",
+                year, "-v2.0.81.nc")
   # retry mechanism for remote access
   nc <- NULL
   for (attempt in 1:maxattempts)
