@@ -114,7 +114,9 @@ get_popdensity <- function(where,
     year, "_", res, "_tif.zip"
   )
   url <- paste0(
-    "https://sedac.ciesin.columbia.edu/downloads/data/gpw-v4/",
+    #"https://sedac.ciesin.columbia.edu/",
+    "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/",
+    "downloads/data/gpw-v4/",
     "gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11/",
     zipfilename
   )
@@ -124,7 +126,8 @@ get_popdensity <- function(where,
   {
     downloaddir <- file.path(Sys.getenv("HOME"), "Downloads")
     if (Sys.info()["sysname"] == "Windows")
-      downloaddir <- file.path(Sys.getenv("USERPROFILE"), "Downloads")
+      downloaddir <- gsub("\\\\", "/", file.path(Sys.getenv("USERPROFILE"),
+                                                 "Downloads"))
   }
 
   # check the specified download directory exits
@@ -155,7 +158,7 @@ get_popdensity <- function(where,
 
   # check successful download and correct path
   if (!file.exists(zipfilename))
-    stop("The dowlonaded file cannot be find. Make sure it is at hte following path:\n",
+    stop("The dowlonaded file cannot be find. Make sure it is at the following path:\n",
          zipfilename)
 
   # extraction directory for the downloaded zip file
