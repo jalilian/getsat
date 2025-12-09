@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_lccs.R
 \name{get_lccs}
 \alias{get_lccs}
-\title{' Retrieve 300m Annual ESA CCI Land Cover (1992–2020)}
+\title{Retrieve 300m Annual ESA CCI Land Cover (1992–2020)}
 \usage{
 get_lccs(
   where,

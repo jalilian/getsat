@@ -1,7 +1,7 @@
 Package: getsat
 Title: Retrieving Commonly Used Satellite Data
-Version: 0.1.1
-Date: 2025-03-21
+Version: 0.2.0
+Date: 2025-12-09
 Depends: R (>= 4.2.0)
 Maintainer: Abdollah Jalilian <stat4aj@gmail.com>
 Authors@R: 
@@ -19,7 +19,7 @@ Description: This package simplifies access to environmental satellite data from
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports: 
     ecmwfr,
     rstac,
