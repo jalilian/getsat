@@ -1,8 +1,14 @@
-#' Retrieve Copernicus Digital Elevation Model (DEM) Data
+#' Retrieve GMTED2010 Digital Elevation Model (DEM) Data
 #'
-#' This function downloads and mosaics Copernicus DEM data from the
-#' Microsoft Planetary Computer. Users can specify a bounding box
-#' or a set of coordinates to retrieve elevation values.
+#' This function downloads and extracts elevation data from the Global
+#' Multi-resolution Terrain Elevation Data 2010 (GMTED2010) dataset as provided
+#' by the Tropospheric Emission Monitoring Internet Service (TEMIS;
+#' <https://www.temis.nl>).
+#'
+#' GMTED2010 is a global digital elevation model jointly developed by the
+#' U.S. Geological Survey (USGS) and the National Geospatial-Intelligence Agency
+#' (NGA). The version hosted by TEMIS is a post-processed and resampled variant
+#' of the original USGS/NGA data, provided at several reduced spatial resolutions.
 #'
 #' @param where Either:
 #'   - A numeric vector of length 4 specifying the bounding box
@@ -11,8 +17,9 @@
 #'     longitude (first column) and latitude (second column) of points.
 #'     All coordinates must be in the WGS84 coordinate reference system.
 #'
-#' @param res Numeric. Resolution of the DEM data in meters.
-#'   Must be either \code{30} or \code{90}.
+#' @param res Numeric. Resolution of the DEM data in degrees.
+#'   Must be either \code{0.0625}, \code{0.125}, \code{0.250}, \code{0.500},
+#'   \code{0.750} or \code{1.000}.
 #'
 #' @param output_dir Character. Directory to store the downloaded DEM tiles.
 #'   Defaults to a temporary directory.
@@ -23,20 +30,14 @@
 #'   coordinates and their corresponding DEM values.
 #'
 #' @details
-#' **Important Note:**
-#' Any use of data provided by the Copernicus program must include proper
-#' citation and acknowledgement of the data sources. Users are required to
-#' follow the license and terms of use specified by Copernicus and European
-#' Space Agency. Failure to do so may violate the data usage policies.
+#' The GMTED2010 dataset is in the public domain and available for use without
+#' restriction.
 #'
 #' @references
-#' - Copernicus DEM: European Space Agency (ESA) and the European Commission.
-#'    + Copernicus Digital Elevation Model (Copernicus DEM), distributed by the European Space Agency under the Copernicus Programme.
-#'    + Available at: https://spacedata.copernicus.eu/ and https://doi.org/10.5069/G9028PQB
-#'
-#' - Microsoft Planetary Computer: Microsoft AI for Earth.
-#'    + Microsoft Planetary Computer.
-#'    + Available at: https://planetarycomputer.microsoft.com/
+#' - Danielson, J.J., and Gesch, D.B., 2011, Global multi-resolution terrain
+#'   elevation data 2010 (GMTED2010): U.S. Geological Survey Open-File Report
+#'   2011–1073, 26 p. http://pubs.usgs.gov/of/2011/1073/
+#' - TEMIS GMTED2010 data: https://www.temis.nl/data/gmted2010/
 #'
 #' @examples
 #' \dontrun{
@@ -59,7 +60,7 @@ get_dem2 <- function(where,
                     res=0.0625,
                     output_dir=tempdir())
 {
-  message("For citation and terms of use, see\n<https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM>")
+  message("For citation and terms of use, see\n<https://www.temis.nl/data/gmted2010.html>")
 
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
