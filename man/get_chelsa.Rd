@@ -8,30 +8,29 @@ get_chelsa(where, var = "clt", year = 2023, month = 1)
 }
 \arguments{
 \item{where}{Numeric vector of length 4 specifying a bounding box
-in the form \code{c(xmin, ymin, xmax, ymax)}
-or a matrix/data.frame with two columns (longitude, latitude)
-representing points of interest.}
+in the form \code{c(xmin, ymin, xmax, ymax)} or a matrix/data.frame with
+two columns (longitude, latitude) representing points of interest.}
 
 \item{var}{Character string specifying the CHELSA variable to retrieve.
 Supported values include:
 \describe{
-\item{\code{"clt"}}{Total Cloud Cover (monthly average; \\%), available for both daily and monthly datasets}
-\item{\code{"hurs"}}{Near-Surface Relative Humidity (monthly average; \\%), both daily and monthly}
-\item{\code{"pr"}}{Precipitation (monthly total; mm), both daily and monthly}
-\item{\code{"prec"}}{Precipitation (alternative version; mm), both daily and monthly}
-\item{\code{"ps"}}{Surface Air Pressure (monthly average; Pa), both daily and monthly}
-\item{\code{"rsds"}}{Surface Downwelling Shortwave Radiation (monthly mean; W m^-2), both daily and monthly}
-\item{\code{"sfcWind"}}{Near-Surface Wind Speed (monthly average; m s^-1), both daily and monthly}
-\item{\code{"tas"}}{Mean Near-Surface Air Temperature (monthly average; K), both daily and monthly}
-\item{\code{"tasmax"}}{Maximum Near-Surface Air Temperature (monthly average; K), both daily and monthly}
-\item{\code{"tasmin"}}{Minimum Near-Surface Air Temperature (monthly average; K), both daily and monthly}
-\item{\code{"tz"}}{Temperature Lapse Rate (K m^-1), both daily and monthly}
-\item{\code{"we"}}{Wind Energy / Wind Power Density (daily specific; W m^-2), daily-only (year >= 2022)}
+\item{clt}{Total Cloud Cover (monthly average, percentage).}
+\item{hurs}{Near-Surface Relative Humidity (monthly average, percentage).}
+\item{pr}{Precipitation (monthly total, mm).}
+\item{prec}{Precipitation alternative version (mm).}
+\item{ps}{Surface Air Pressure (monthly average, Pa).}
+\item{rsds}{Surface Downwelling Shortwave Radiation (monthly mean, W / m2).}
+\item{sfcWind}{Near-Surface Wind Speed (monthly average, m s^-1).}
+\item{tas}{Mean Near-Surface Air Temperature (monthly average, K).}
+\item{tasmax}{Maximum Near-Surface Air Temperature (monthly average, K).}
+\item{tasmin}{Minimum Near-Surface Air Temperature (monthly average, K).}
+\item{tz}{Temperature Lapse Rate (K/m).}
+\item{we}{Wind Energy / Wind Power Density (W m^-2).}
 }}
 
-\item{year}{Integer (1979-2025).}
+\item{year}{Integer specifying the year (1979-2025)}
 
-\item{month}{Integer (1-12).}
+\item{month}{Integer specifying the month (1-12)}
 }
 \value{
 If \code{where} is a bounding box (vector of length four), a \code{SpatRaster}
@@ -64,20 +63,12 @@ tas_mat <- get_chelsa(coords, var="tas", year=2020, month=6)
 
 }
 \references{
-\itemize{
-\item Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza, R.W.,
-Zimmermann, N.E., Linder, H.P., Kessler, M., 2017.
-Climatologies at high resolution for the earth’s land surface areas.
-Scientific Data, 4, 170122.
-Available at: \url{https://chelsa-climate.org/}
-\item Karger, D.N., Conrad, O., Bohner, J., Kawohl, T., Kreft, H., Soria-Auza, R.W.,
-Zimmermann, N.E., Linder, P., Kessler, M., 2021.
-CHELSA v2.1: Climatologies at high resolution for the earth’s land surface areas.
-EnviDat. \doi{10.16904/envidat.228}
-}
+Karger, D.N., et al. (2017). Climatologies at high resolution for the
+earth's land surface areas. Scientific Data, 4, 170122.
+\url{https://chelsa-climate.org/}
 }
 \seealso{
-\link[terra]{rast}
+\code{\link[terra]{rast}}
 }
 \author{
 Abdollah Jalilian
