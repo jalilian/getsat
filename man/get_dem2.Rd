@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_dem2.R
 \name{get_dem2}
 \alias{get_dem2}
-\title{Retrieve Copernicus Digital Elevation Model (DEM) Data}
+\title{Retrieve GMTED2010 Digital Elevation Model (DEM) Data}
 \usage{
 get_dem2(where, res = 0.0625, output_dir = tempdir())
 }
@@ -16,8 +16,9 @@ longitude (first column) and latitude (second column) of points.
 All coordinates must be in the WGS84 coordinate reference system.
 }}
 
-\item{res}{Numeric. Resolution of the DEM data in meters.
-Must be either \code{30} or \code{90}.}
+\item{res}{Numeric. Resolution of the DEM data in degrees.
+Must be either \code{0.0625}, \code{0.125}, \code{0.250}, \code{0.500},
+\code{0.750} or \code{1.000}.}
 
 \item{output_dir}{Character. Directory to store the downloaded DEM tiles.
 Defaults to a temporary directory.}
@@ -29,16 +30,19 @@ If \code{where} is a matrix or data frame, returns a \code{data.frame} with
 coordinates and their corresponding DEM values.
 }
 \description{
-This function downloads and mosaics Copernicus DEM data from the
-Microsoft Planetary Computer. Users can specify a bounding box
-or a set of coordinates to retrieve elevation values.
+This function downloads and extracts elevation data from the Global
+Multi-resolution Terrain Elevation Data 2010 (GMTED2010) dataset as provided
+by the Tropospheric Emission Monitoring Internet Service (TEMIS;
+\url{https://www.temis.nl}).
 }
 \details{
-\strong{Important Note:}
-Any use of data provided by the Copernicus program must include proper
-citation and acknowledgement of the data sources. Users are required to
-follow the license and terms of use specified by Copernicus and European
-Space Agency. Failure to do so may violate the data usage policies.
+GMTED2010 is a global digital elevation model jointly developed by the
+U.S. Geological Survey (USGS) and the National Geospatial-Intelligence Agency
+(NGA). The version hosted by TEMIS is a post-processed and resampled variant
+of the original USGS/NGA data, provided at several reduced spatial resolutions.
+
+The GMTED2010 dataset is in the public domain and available for use without
+restriction.
 }
 \examples{
 \dontrun{
@@ -55,16 +59,10 @@ Space Agency. Failure to do so may violate the data usage policies.
 }
 \references{
 \itemize{
-\item Copernicus DEM: European Space Agency (ESA) and the European Commission.
-\itemize{
-\item Copernicus Digital Elevation Model (Copernicus DEM), distributed by the European Space Agency under the Copernicus Programme.
-\item Available at: https://spacedata.copernicus.eu/ and https://doi.org/10.5069/G9028PQB
-}
-\item Microsoft Planetary Computer: Microsoft AI for Earth.
-\itemize{
-\item Microsoft Planetary Computer.
-\item Available at: https://planetarycomputer.microsoft.com/
-}
+\item Danielson, J.J., and Gesch, D.B., 2011, Global multi-resolution terrain
+elevation data 2010 (GMTED2010): U.S. Geological Survey Open-File Report
+2011–1073, 26 p. http://pubs.usgs.gov/of/2011/1073/
+\item TEMIS GMTED2010 data: https://www.temis.nl/data/gmted2010/
 }
 }
 \seealso{
