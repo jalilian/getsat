@@ -4,7 +4,14 @@
 \alias{get_terraclimate}
 \title{Retrieve TerraClimate Data}
 \usage{
-get_terraclimate(where, var = "pet", maxattempts = 5, delay = 2)
+get_terraclimate(
+  where,
+  var = "pet",
+  start_date = NULL,
+  end_date = NULL,
+  maxattempts = 5,
+  delay = 2
+)
 }
 \arguments{
 \item{where}{Numeric vector of length 4 specifying a bounding box
@@ -30,6 +37,14 @@ Supported values include:
 \item{\code{"ws"}}{Wind Speed (monthly average; m s^-1)}
 \item{\code{"PDSI"}}{Palmer Drought Severity Index (end of month; unitless)}
 }}
+
+\item{start_date}{Optional start date for subsetting the time series.
+Must be coercible to \code{Date} (e.g., \code{"YYYY-MM-DD"}).
+If \code{NULL} (default), data are returned from the earliest available date (1958-01-01).}
+
+\item{end_date}{Optional end date for subsetting the time series.
+Must be coercible to \code{Date} (e.g., \code{"YYYY-MM-DD"}).
+If \code{NULL} (default), data are returned up to the most recent available date.}
 
 \item{maxattempts}{Integer, default \code{5}. Maximum number of attempts to connect
 to the server before failing.}
@@ -67,11 +82,11 @@ Data access is provided through the Northwest Knowledge Network
 \dontrun{
 # Bounding box
 bbox <- c(44, 25, 63, 40)
-pet_raster <- get_terraclimate(bbox, var = "pet")
+pet_raster <- get_terraclimate(bbox, var = "pet", start_date="2010-01-01", end_date="2024-12-31")
 
 # Using coordinates matrix
 coords <- cbind(runif(n=10, 44, 63), runif(n=10, 25, 40))
-pet_raster <- get_terraclimate(coords)
+pet_mat <- get_terraclimate(coords)
 }
 
 }

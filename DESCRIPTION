@@ -1,16 +1,17 @@
 Package: getsat
 Title: Retrieving Commonly Used Satellite Data
-Version: 0.1.1
-Date: 2025-03-21
+Version: 0.2.1
+Date: 2026-03-23
 Depends: R (>= 4.2.0)
 Maintainer: Abdollah Jalilian <stat4aj@gmail.com>
 Authors@R: 
-    person("Abdollah", "Jalilian", role = c("cre", "aut"),
-    email = "stat4aj@gmail.com", comment=c(orcid = "0000-0002-6573-006"))
+    person("Abdollah", "Jalilian", role=c("cre", "aut"),
+           email="stat4aj@gmail.com", comment=c(ORCID="0000-0002-6573-006"))
 Description: This package simplifies access to environmental satellite data from 
     sources like the Copernicus Climate Data Store (see <https://cds.climate.copernicus.eu>), 
-    Copernicus Atmosphere Data Store (see <https://ads.atmosphere.copernicus.eu/>), 
-    and Microsoft Planetary Computer (see <https://planetarycomputer.microsoft.com/>). 
+    Copernicus Atmosphere Data Store (see <https://ads.atmosphere.copernicus.eu>), 
+    Microsoft Planetary Computer (see <https://planetarycomputer.microsoft.com>),
+    WorldClim (see <https://www.worldclim.org>) and CHELSA (<https://chelsa-climate.org>). 
     Users must properly acknowledge all data sources by properly citing and 
     referencing datasets according to their licenses and terms of use. Development 
     of this package was supported by the Lancaster Ecology and Epidemiology Group (LEEG) 
@@ -19,7 +20,7 @@ Description: This package simplifies access to environmental satellite data from
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports: 
     ecmwfr,
     rstac,

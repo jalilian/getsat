@@ -29,8 +29,18 @@
 #'     \item{\code{"ws"}}{Wind Speed (monthly average; m s^-1)}
 #'     \item{\code{"PDSI"}}{Palmer Drought Severity Index (end of month; unitless)}
 #'   }
+#'
+#' @param start_date Optional start date for subsetting the time series.
+#'        Must be coercible to `Date` (e.g., `"YYYY-MM-DD"`).
+#'        If `NULL` (default), data are returned from the earliest available date (1958-01-01).
+#'
+#' @param end_date Optional end date for subsetting the time series.
+#'        Must be coercible to `Date` (e.g., `"YYYY-MM-DD"`).
+#'        If `NULL` (default), data are returned up to the most recent available date.
+#'
 #' @param maxattempts Integer, default `5`. Maximum number of attempts to connect
 #'        to the server before failing.
+#'
 #' @param delay Numeric, default `2`. Initial delay in seconds between retries,
 #'        which increases exponentially.
 #'
@@ -54,11 +64,11 @@
 #' \dontrun{
 #' # Bounding box
 #' bbox <- c(44, 25, 63, 40)
-#' pet_raster <- get_terraclimate(bbox, var = "pet")
+#' pet_raster <- get_terraclimate(bbox, var = "pet", start_date="2010-01-01", end_date="2024-12-31")
 #'
 #' # Using coordinates matrix
 #' coords <- cbind(runif(n=10, 44, 63), runif(n=10, 25, 40))
-#' pet_raster <- get_terraclimate(coords)
+#' pet_mat <- get_terraclimate(coords)
 #' }
 #'
 #' @seealso \link[terra]{rast}, \link[ncdf4]{nc_open}
@@ -73,6 +83,8 @@
 #' @export
 get_terraclimate <- function(where,
                              var = "pet",
+                             start_date = NULL,
+                             end_date = NULL,
                              maxattempts = 5,
                              delay = 2)
 {
@@ -81,10 +93,8 @@ get_terraclimate <- function(where,
   {
     bbox <- where
   } else if (inherits(where, c("matrix", "data.frame")) && ncol(where) == 2) {
-    bbox <- c(
-      min(where[, 1]) - 0.2, min(where[, 2]) - 0.2,
-      max(where[, 1]) + 0.2, max(where[, 2]) + 0.2
-    )
+    bbox <- c(min(where[, 1]) - 0.2, min(where[, 2]) - 0.2,
+              max(where[, 1]) + 0.2, max(where[, 2]) + 0.2)
   } else {
     stop("'where' must be a numeric vector of length 4 or a 2-column matrix/data.frame.")
   }
@@ -103,10 +113,10 @@ get_terraclimate <- function(where,
   allowed_vars <- c("aet", "def", "pet", "ppt", "q", "soil", "srad",
                     "swe", "tmax", "tmin", "vap", "vpd", "ws", "PDSI")
   if (!(var %in% allowed_vars))
-    stop(sprintf("'var' must be one of: %s",
-                 paste(allowed_vars, collapse = ", ")))
+    stop("Invalid 'var'. Must be one of: ", paste(allowed_vars, collapse=", "))
 
-  message("Connecting to the server to download TerraClimate data...\n")
+
+  message("Connecting to TerraClimate server...")
   url <- paste0("http://thredds.northwestknowledge.net:8080/thredds/dodsC/",
                 "agg_terraclimate_", var, "_1958_CurrentYear_GLOBE.nc")
 
@@ -114,58 +124,69 @@ get_terraclimate <- function(where,
   nc <- NULL
   for (attempt in 1:maxattempts)
   {
-    nc <- tryCatch(ncdf4::nc_open(url), error = function(e) {
-      message(sprintf("Attempt %d failed: %s", attempt, e$message))
-      return(NULL)
-    })
+    nc <- tryCatch(ncdf4::nc_open(url), error = function(e) NULL)
     if (!is.null(nc)) break
-    Sys.sleep(delay * 2^(attempt - 1))  # exponential backoff
+    message(sprintf("Attempt %d failed. Retrying in %.1f sec...",
+                    attempt, delay * 2^(attempt - 1)))
+    Sys.sleep(delay * 2^(attempt - 1))
   }
   if (is.null(nc))
-    stop("Failed to connect to NetCDF after retries.")
+    stop("Failed to connect to TerraClimate server.")
 
-  # read longitude, latitude, and time
+  # read longitude, latitude and time
   lon <- ncdf4::ncvar_get(nc, "lon")
   lat <- ncdf4::ncvar_get(nc, "lat")
   time <- ncdf4::ncvar_get(nc, "time")
-  dates <- as.Date(time, origin = "1900-01-01")
+  origin <- sub("days since ", "", ncdf4::ncatt_get(nc, "time", "units")$value)
+  dates <- as.Date(time, origin=origin)
 
   # subset indices for requested area
   lon_idx <- which(lon >= bbox[1] & lon <= bbox[3])
   lat_idx <- which(lat >= bbox[2] & lat <= bbox[4])
+  if (length(lon_idx) == 0 || length(lat_idx) == 0)
+    stop("Bounding box does not overlap dataset.")
 
-  # read each time slice and create SpatRaster
-  n_time <- length(time)
-  layers <- vector("list", n_time)
-  for (i in 1:n_time)
-  {
-    slice <- ncdf4::ncvar_get(nc, var,
-                       start = c(min(lon_idx), min(lat_idx), i),
-                       count = c(length(lon_idx), length(lat_idx), 1))
+  # subset time
+  keep <- rep(TRUE, length(dates))
 
-    # transpose
-    r <- terra::rast(t(slice))
-    terra::ext(r) <- c(min(lon[lon_idx]), max(lon[lon_idx]),
-                min(lat[lat_idx]), max(lat[lat_idx]))
-    terra::crs(r) <- "EPSG:4326"
+  if (!is.null(start_date))
+    keep <- keep & (dates >= as.Date(start_date))
+  if (!is.null(end_date))
+    keep <- keep & (dates <= as.Date(end_date))
+  time_idx <- which(keep)
+  if (length(time_idx) == 0)
+    stop("No data available for requested time range.")
 
-    layers[[i]] <- r
-  }
-
+  # read data in one call
+  message("Downloading data (this may take a moment)...")
+  arr <- ncdf4::ncvar_get(nc, var,
+                          start=c(min(lon_idx), min(lat_idx), min(time_idx)),
+                          count=c(length(lon_idx), length(lat_idx), length(time_idx)))
   ncdf4::nc_close(nc)
+  # fix dimension order
+  dim_names <- sapply(nc$var[[var]]$dim, function(x) x$name)
+  # expect lon, lat, time
+  if (!all(c("lon", "lat", "time") %in% dim_names))
+    stop("Unexpected dimension order in NetCDF")
+  # reorder dynamically
+  arr <- aperm(arr,  match(c("lat", "lon", "time"), dim_names))
 
-  # combine layers into a single SpatRaster and set time
-  rdata <- terra::rast(layers)
-  terra::time(rdata) <- dates
+  # create SpatRaster
+  r <- terra::rast(arr, extent=c(min(lon[lon_idx]), max(lon[lon_idx]),
+                                 min(lat[lat_idx]), max(lat[lat_idx])),
+                   crs="EPSG:4326")
+  # assign time + names
+  terra::time(r) <- dates[time_idx]
+  names(r) <- paste0(var, "_", format(dates[time_idx], "%Y_%m"))
 
   # if 'where' is a matrix/data frame, extract var values for points
   if (inherits(where, c("matrix", "data.frame")))
   {
     where <- data.frame(where)
-    rdata <- terra::extract(rdata, where, ID=FALSE)
-    names(rdata) <- paste(var, names(rdata), sep="_")
-    rdata <- cbind(where, rdata)
+    vals <- terra::extract(r, where, ID=FALSE)
+    names(vals) <- names(r)
+    return(cbind(where, vals))
   }
 
-  return(rdata)
+  return(r)
 }
