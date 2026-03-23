@@ -115,7 +115,7 @@ get_dem2 <- function(where,
 
       if (status == 200)
       {
-        download.file(url[res_idx], destfile=destfile, method="libcurl", mode="wb")
+        utils::download.file(url[res_idx], destfile=destfile, method="libcurl", mode="wb")
         break
       } else if (attempt >= 5) {
         stop("Failed to connect to the API after ", 5,

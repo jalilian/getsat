@@ -82,7 +82,7 @@ get_roaddensity <- function(where,
   valid_type <- 0:5
   if (!(is.numeric(type) && length(type) == 1 && type %in% valid_type))
     stop(sprintf("'type' must be a numeric value and one of the following: %s",
-                 paste(valid_years, collapse = ", ")))
+                 paste(valid_type, collapse = ", ")))
 
   # construct zip file name and the URL
 
