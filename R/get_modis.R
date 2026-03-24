@@ -282,7 +282,8 @@ get_modis <- function(where,
       if (crop)
       {
         # project the extent to match the raster's CRS
-        pbx <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+        pbx <- terra::project(terra::ext(bbox[1], bbox[3], bbox[2], bbox[4]),
+                              from="EPSG:4326", to=terra::crs(r))
         w <- terra::intersect(terra::ext(r), pbx)
         r <- terra::crop(r, pbx)
       }
@@ -311,7 +312,8 @@ get_modis <- function(where,
       if (crop)
       {
         # project the extent to match the raster's CRS
-        pbx <- terra::project(terra::ext(bbox, xy=TRUE), "EPSG:4326", terra::crs(r))
+        pbx <- terra::project(terra::ext(bbox[1], bbox[3], bbox[2], bbox[4]),
+                              from="EPSG:4326", to=terra::crs(r))
         w <- terra::intersect(terra::ext(r), pbx)
         r <- terra::crop(r, pbx)
       }
