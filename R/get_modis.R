@@ -25,7 +25,7 @@
 #' @param crop Logical, whether to crop the retrieved raster data to the bounding box. Default is TRUE.
 #'
 #' @param w Window size for the moving window method to fill missing (NA) values using the `focal` function from the `terra` package.
-#'        If `w = NA` (default), missing values are not filled. See the documentation of `terra::focal` for more details.
+#'        If `w=NA` (default), missing values are not filled. See the documentation of `terra::focal` for more details.
 #'
 #' @param agglevel A character string specifying the temporal aggregation level for the retrieved data, using the `aggregate` function
 #'        in the `terra` package. Available options include:
@@ -49,7 +49,7 @@
 #'        Default is a temporary directory.
 #'
 #' @param clean_dir Logical. If `TRUE`, downloaded files are deleted after processing
-#' (applies only when `download = TRUE`). Default is `FALSE`.
+#' (applies only when `download=TRUE`). Default is `FALSE`.
 #'
 #' @details
 #'
@@ -96,14 +96,14 @@
 #' @examples
 #' \dontrun{
 #'   # Retrieve 8-day daytime 1km grid land surface temperature for a bounding box
-#'   temp <- get_modis(c(-3, 5, -2, 6), var = "LST_Day_1KM",
-#'                     datetime = "2023-11-01/2024-02-28")
+#'   temp <- get_modis(c(-3, 5, -2, 6), var="LST_Day_1KM",
+#'                     datetime="2023-11-01/2024-02-28")
 #'   plot(temp)
 #'
 #'   # Retrieve yearly total evapotranspiration for specific coordinates
-#'   coords <- cbind(runif(n = 100, -3, -2), runif(n = 100, 5, 6))
+#'   coords <- cbind(runif(n=100, -3, -2), runif(n=100, 5, 6))
 #'   et_points <- get_modis(coords, var="ET_500m",
-#'                         datetime = "2023-11-01/2024-02-28")
+#'                         datetime="2023-11-01/2024-02-28")
 #'   print(et_points)
 #' }
 #'
@@ -174,14 +174,14 @@ get_modis <- function(where,
       message(paste0("\033[", 32, "m", var, "\033[0m"),
               " has been found in collection(s):\n",
               paste(utils::capture.output(print(unname(collection[, 1:2]))),
-                    collapse = "\n"),
+                    collapse="\n"),
               "\n")
       if (nrow(collection) > 1)
       {
         message(paste0("\033[", 34, "m", collection[1, 1], "\033[0m"),
                 " (", collection[1, 2],
                 ") is selected.\nUse argument 'collection' if you need: ",
-                paste(collection[-1, 1], collapse = ", "),
+                paste(collection[-1, 1], collapse=", "),
                 "\n")
       }
       message(paste("-- Collection description ", strrep("-", 24), "\n",
@@ -211,13 +211,13 @@ get_modis <- function(where,
           # STAC search API
           rstac::stac_search(
             # collection IDs to include in the search for items
-            collections = collection,
+            collections=collection,
             # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-            bbox = bbox,
+            bbox=bbox,
             # date-time range
-            datetime = datetime,
+            datetime=datetime,
             # maximum number of results
-            limit = NULL
+            limit=NULL
           ) |>
           # HTTP GET requests to STAC web services
           rstac::get_request() |>
@@ -226,7 +226,7 @@ get_modis <- function(where,
           # fetch all STAC Items
           rstac::items_fetch()
       },
-      error = function(e) {
+      error=function(e) {
         message(sprintf("Attempt %d failed: %s", attempt, e$message))
         return(NULL)
       }
@@ -252,14 +252,21 @@ get_modis <- function(where,
                   # Split by "." and extract date and tile
                   parts <- strsplit(o$id, "\\.")[[1]]
                   # date: year and day of the year
-                  date <- as.Date(parts[2], format = "A%Y%j")
+                  date <- as.Date(parts[2], format="A%Y%j")
                   # horizontal tile number, vertical tile number
                   tile <- parts[3]
                   return(data.frame(collection=parts[1], date=date, tile=tile))
                 }))
+
+  # filter items that fall outside requested datetime
+  valid_idx <- (ids$date >= as.Date(sub("/.*", "", datetime))) &
+    (ids$date <= as.Date(sub(".*/", "", datetime)))
+  items$features <- items$features[valid_idx]
+  ids <- ids[valid_idx, ]
+
   message("Getting MODIS data \n  tiles: ",
-          paste(unique(ids$tile), collapse = ", "), "\n  dates: ",
-          paste(unique(ids$date), collapse = ", "), "\n")
+          paste(unique(ids$tile), collapse=", "), "\n  dates: ",
+          paste(unique(ids$date), collapse=", "), "\n")
 
   # check HTTP errors
   httperror <- vapply(items$features, function(o) {
@@ -272,7 +279,7 @@ get_modis <- function(where,
   if (!download)
   {
     # set temporary directory for terra
-    terra::terraOptions(tempdir = output_dir)
+    terra::terraOptions(tempdir=output_dir)
     # create the progress bar
     pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
     icount <- 0
@@ -293,7 +300,7 @@ get_modis <- function(where,
       return(r)
     })
     # clean up terra temporary files
-    terra::tmpFiles(remove = TRUE)
+    terra::tmpFiles(remove=TRUE)
     cat("\n")
   } else{
     if (clean_dir)
@@ -302,8 +309,7 @@ get_modis <- function(where,
     # download items for the slected var(s)
     items <- items |>
       rstac::assets_select(asset_names=var) |>
-      rstac::assets_download(asset_names = var,
-                             items_max=Inf,
+      rstac::assets_download(asset_names=var, items_max=Inf,
                              overwrite=TRUE, output_dir=output_dir)
 
     # load and process rasters
@@ -339,6 +345,11 @@ get_modis <- function(where,
   }, rdata, names(rdata), SIMPLIFY=FALSE)
 
   # convert list of rasters to one multi-layer raster
+  rdata <- lapply(rdata, function(x) {
+    if (!terra::compareGeom(x, rdata[[1]], stopOnError=FALSE))
+      return(terra::resample(x, rdata[[1]], method="near"))
+    return(x)
+  })
   rdata <- terra::rast(rdata)
 
   # moving window (focal) aggregation by window size w
