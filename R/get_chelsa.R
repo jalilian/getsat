@@ -98,15 +98,15 @@ get_chelsa <- function(where, var="clt",  year=2023, month=1)
     {
       message("Monthly file not found. Aggregating daily files for ", year, "-", m)
       # determine number of days in the requested month
-      days_in_month <- as.integer(format(as.Date(paste0(year, "-", as.integer(m) + 1, "-01")) - 1, "%d"))
+      start <- as.Date(sprintf("%d-%02d-01", year, m))
+      days_in_month <- as.integer(seq(start, by="month", length.out=2)[2] - start)
       daily_layers <- list()
       for (d in 1:days_in_month)
       {
-        d_str <- sprintf("%02d", d)
+        # daily data
         url_day <- sprintf(
           "https://os.unil.cloud.switch.ch/chelsa02/chelsa/global/daily/%s/%d/CHELSA_%s_%s_%s_%d_V.2.1.tif",
-          var, year, var, d_str, m, year)
-
+          var, year, var, sprintf("%02d", d), m, year)
         r_day <- tryCatch({
           terra::crop(terra::rast(paste0("/vsicurl/", url_day)), ext_crop)
         }, error = function(e) {
@@ -114,7 +114,8 @@ get_chelsa <- function(where, var="clt",  year=2023, month=1)
           return(NULL)
         })
 
-        if (!is.null(r_day)) daily_layers[[d]] <- r_day
+        if (!is.null(r_day))
+          daily_layers[[length(daily_layers) + 1]] <- r_day
       }
 
       if (length(daily_layers) == 0)
