@@ -41,12 +41,12 @@
 #' @examples
 #' \dontrun{
 #'   # Retrieve DEM for a bounding box
-#'   dem_raster <- get_dem(c(-3, 5, -2, 6), res = 90)
+#'   dem_raster <- get_dem(c(-3, 5, -2, 6), res=90)
 #'   plot(dem_raster)
 #'
 #'   # Retrieve DEM for specific coordinates
-#'   coords <- cbind(runif(n = 100, -3, -2), runif(n = 100, 5, 6))
-#'   dem_points <- get_dem(coords, res = 90)
+#'   coords <- cbind(runif(n=100, -3, -2), runif(n=100, 5, 6))
+#'   dem_points <- get_dem(coords, res=90)
 #'   print(dem_points)
 #' }
 #'
@@ -80,8 +80,8 @@ get_dem <- function(where,
     stop("Bounding box must be in the format c(xmin, ymin, xmax, ymax) with valid coordinates.")
 
   # valid geographical boundaries
-  if (any(bbox[1] <= -180 | bbox[3] >= 180 |
-          bbox[2] <= -90 | bbox[4] >= 90))
+  if (any(bbox[1] < -180 | bbox[3] > 180 |
+          bbox[2] < -90 | bbox[4] > 90))
     stop("The specified area is outside the valid data coverage region.")
 
   # validate resolution
@@ -104,11 +104,11 @@ get_dem <- function(where,
         # STAC search API
         rstac::stac_search(
           # collection IDs to include in the search for items
-          collections = paste0("cop-dem-glo-", res),
+          collections=paste0("cop-dem-glo-", res),
           # bounding box (xmin, ymin, xmax, ymax) in  WGS84 longitude/latitude
-          bbox = bbox,
+          bbox=bbox,
           # maximum number of results
-          limit = 999
+          limit=999
         ) |>
         # HTTP GET requests to STAC web services
         rstac::get_request() |>
@@ -135,32 +135,42 @@ get_dem <- function(where,
 
   message("Getting Copernicus DEM data tiles:\n  ",
           paste(unlist(lapply(items$features, function(o) o$id)),
-                collapse = "\n  "), "\n")
+                collapse="\n  "), "\n")
 
   # set temporary directory for terra
-  terra::terraOptions(tempdir = output_dir)
+  terra::terraOptions(tempdir=output_dir)
   # create the progress bar
   pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
   icount <- 0
   # load and process rasters
   rdata <- lapply(items$features, function(o){
     r <- terra::rast(o$assets$data$href)
-    w <- terra::ext(bbox, xy=TRUE)
+    w <- terra::ext(bbox[1], bbox[3], bbox[2], bbox[4])
     w <- terra::intersect(terra::ext(r), w)
+    # skip tiles that do not overlap
+    if (is.null(w))
+      return(NULL)
     r <- terra::crop(r, w)
-    # ppdate the progress bar
+    # update the progress bar
     icount <<- icount + 1
     utils::setTxtProgressBar(pb, icount)
     return(r)
   })
+  close(pb)
   cat("\n")
 
-  if (length(rdata) == 1)
+  # remove null components
+  rdata <- Filter(Negate(is.null), rdata)
+
+  if (length(rdata) == 0)
+  {
+    stop("No overlapping raster tiles found for the specified area.")
+  } else if (length(rdata) == 1)
   {
     rdata <- rdata[[1]]
   } else{
     # merge raster tiles into a single raster,  if more than one tile
-    rdata <- do.call(terra::mosaic, c(rdata, list(fun="mean")))
+    rdata <- terra::mosaic(terra::sprc(rdata), fun="mean")
   }
 
   # if 'where' is a matrix/data frame, extract elevation values for points
@@ -168,12 +178,11 @@ get_dem <- function(where,
   {
     where <- data.frame(where)
     rdata <- terra::extract(rdata, where, ID=FALSE)
-    names(rdata) <- "elevation"
-    rdata <- data.frame(where, rdata)
+    rdata <- data.frame(where, elevation=rdata[[1]])
   }
 
   # clean up terra temporary files
-  terra::tmpFiles(remove = TRUE)
+  #terra::tmpFiles(remove=TRUE)
 
   return(rdata)
 }
