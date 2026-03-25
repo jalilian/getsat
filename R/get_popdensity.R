@@ -11,7 +11,7 @@
 #'
 #' @param where A numeric vector of length 4 (bounding box) or a matrix/data.frame with two columns (longitude, latitude) specifying the spatial region of interest. If a bounding box is provided, the coordinates should be in the format: c(xmin, ymin, xmax, ymax).
 #'
-#' @param year An integer specifying the year for which the population density data is required. Valid values are: 2000, 2005, 2011, 2015, and 2020. The default is 2020.
+#' @param year An integer specifying the year for which the population density data is required. Valid values are: 2000, 2005, 2010, 2015, and 2020. The default is 2020.
 #'
 #' @param res A character string specifying the resolution of the population density data. Options include:
 #' - "30_sec" for 30 arc-seconds (~1 km at the equator),
@@ -24,7 +24,7 @@
 #' @param downloaddir A character string specifying the directory where the data file should be downloaded. If not specified, the system's default download directory is used (Windows: `file.path(Sys.getenv("USERPROFILE"), "Downloads")`, macOS/Linux: `file.path(Sys.getenv("HOME"), "Downloads")`).
 #'
 #' @details
-#' The available years are 2000, 2005, 2011, 2015, and 2020.
+#' The available years are 2000, 2005, 2010, 2015, and 2020.
 #'
 #' The data are provided as global rasters at the following resolutions:
 #' - 30 arc-second (~1 km resolution at the equator),
@@ -53,7 +53,7 @@
 #'  terra::plot(pd1)
 #'
 #'  # Get population density for specific coordinates
-#'  coords <- cbind(runif(n = 100, -5, -1), runif(n = 100, 4, 10))
+#'  coords <- cbind(runif(n=100, -5, -1), runif(n=100, 4, 10))
 #'  pd2 <- get_popdensity(coords, year=2020, res="1_deg")
 #'  print(pd2)
 #' }
@@ -72,7 +72,7 @@
 get_popdensity <- function(where,
                            year=2020,
                            res="30_sec",
-                           downloaddir = NULL)
+                           downloaddir=NULL)
 {
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
@@ -93,19 +93,19 @@ get_popdensity <- function(where,
     stop("Bounding box must be in the format c(xmin, ymin, xmax, ymax) with valid coordinates.")
 
   # valid year and resolution options
-  valid_years <- seq(2000, 2020, by = 5)
+  valid_years <- seq(2000, 2020, by=5)
   valid_ress <- c("30_sec", "2pt5_min", "15_min", "30_min", "1_deg")
 
   # validate year
   if (!(is.numeric(year) && length(year) == 1 && year %in% valid_years))
     stop(sprintf("'year' must be a numeric value and one of the following: %s",
-                 paste(valid_years, collapse = ", ")))
+                 paste(valid_years, collapse=", ")))
 
 
   # validate res
   if (!(is.character(res) && length(res) == 1 && res %in% valid_ress)) {
     stop(sprintf("'res' must be a character string and one of the following: %s",
-                 paste(valid_ress, collapse = ", ")))
+                 paste(valid_ress, collapse=", ")))
   }
 
   # construct zip file name and the URL
@@ -134,12 +134,8 @@ get_popdensity <- function(where,
   if (!dir.exists(downloaddir))
     stop("'downloaddir' does not exist or is not a directory.")
 
-  # ensure directory ends with '/'
-  if (!grepl("/$", downloaddir))
-    downloaddir <- paste0(downloaddir, "/")
-
   # full path to the ZIP file in the download directory
-  zipfilename <- paste0(downloaddir, zipfilename)
+  zipfilename <- file.path(downloaddir, zipfilename)
 
 
   if (!file.exists(zipfilename))
@@ -162,15 +158,15 @@ get_popdensity <- function(where,
          zipfilename)
 
   # extraction directory for the downloaded zip file
-  exdir <- paste0(downloaddir, "popdensity", year, res, "/")
+  exdir <- file.path(downloaddir, paste0("popdensity", year, res))
   if (!dir.exists(exdir))
-    dir.create(exdir)
+    dir.create(exdir, recursive=TRUE)
 
   # extract the contents of the ZIP file
   utils::unzip(zipfilename, exdir=exdir)
 
   # load raster data
-  rdata <- terra::rast(list.files(exdir, pattern = "\\.tif$", full.names = TRUE))
+  rdata <- terra::rast(list.files(exdir, pattern="\\.tif$", full.names=TRUE))
 
   # if 'where' is a matrix/data frame, extract pop-density values for points
   if (inherits(where, c("matrix", "data.frame")))

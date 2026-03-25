@@ -141,9 +141,13 @@ get_dem <- function(where,
   terra::terraOptions(tempdir=output_dir)
   # create the progress bar
   pb <- utils::txtProgressBar(min=0, max=length(items$features), style=3)
+  on.exit(close(pb))  # ensures cleanup even if an error occurs
   icount <- 0
   # load and process rasters
   rdata <- lapply(items$features, function(o){
+    # update the progress bar
+    icount <<- icount + 1
+    utils::setTxtProgressBar(pb, icount)
     r <- terra::rast(o$assets$data$href)
     w <- terra::ext(bbox[1], bbox[3], bbox[2], bbox[4])
     w <- terra::intersect(terra::ext(r), w)
@@ -151,12 +155,8 @@ get_dem <- function(where,
     if (is.null(w))
       return(NULL)
     r <- terra::crop(r, w)
-    # update the progress bar
-    icount <<- icount + 1
-    utils::setTxtProgressBar(pb, icount)
     return(r)
   })
-  close(pb)
   cat("\n")
 
   # remove null components
