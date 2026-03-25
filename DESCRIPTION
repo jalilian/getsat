@@ -6,7 +6,7 @@ Depends: R (>= 4.2.0)
 Maintainer: Abdollah Jalilian <stat4aj@gmail.com>
 Authors@R: 
     person("Abdollah", "Jalilian", role=c("cre", "aut"),
-           email="stat4aj@gmail.com", comment=c(ORCID="0000-0002-6573-006"))
+           email="stat4aj@gmail.com", comment=c(ORCID="0000-0002-6573-0069"))
 Description: This package simplifies access to environmental satellite data from 
     sources like the Copernicus Climate Data Store (see <https://cds.climate.copernicus.eu>), 
     Copernicus Atmosphere Data Store (see <https://ads.atmosphere.copernicus.eu>), 
