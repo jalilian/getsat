@@ -90,11 +90,12 @@ get_landcover <- function(where,
   hdf_links <- as.character(na.omit(unique(hdf_links)))
 
   # check for missing files and trigger Browser authentication
-  expected_files <- basename(hdf_links)
-  existing_files <- basename(list.files(downloaddir, pattern="\\.hdf$",
-                                        full.names=FALSE))
-  missing_links <- hdf_links[basename(hdf_links) %in%
-                               setdiff(expected_files, existing_files)]
+  tile_id <- function(x) { sub(".*(h[0-9]{2}v[0-9]{2}).*", "\\1", x) }
+  expected_tiles <- unique(tile_id(hdf_links))
+  existing_files <- list.files(downloaddir, pattern="\\.hdf$", full.names=TRUE)
+  existing_tiles <- unique(tile_id(existing_files))
+  missing_links <- hdf_links[tile_id(hdf_links) %in%
+                               setdiff(expected_tiles, existing_tiles)]
   if (length(missing_links) > 0)
   {
     utils::browseURL(missing_links[1])
@@ -105,12 +106,13 @@ get_landcover <- function(where,
     readline()
   }
   # re-check after download
-  existing_files <- basename(list.files(downloaddir, pattern="\\.hdf$"))
-  missing_files <- setdiff(expected_files, existing_files)
-  if (length(missing_files) > 0)
+  existing_files <- list.files(downloaddir, pattern="\\.hdf$", full.names=TRUE)
+  existing_tiles <- unique(tile_id(existing_files))
+  if (length(setdiff(expected_tiles, existing_tiles)) > 0)
     stop("Some required tiles are still missing in: ", downloaddir)
-  tile_files <- file.path(downloaddir, expected_files)
-  tile_files <- tile_files[file.exists(tile_files)]
+
+  tile_files <- existing_files[tile_id(existing_files) %in% expected_tiles]
+  tile_files <- tile_files[!duplicated(tile_id(tile_files))]
   if (length(tile_files) == 0)
     stop("No HDF files found in: ", downloaddir)
 
