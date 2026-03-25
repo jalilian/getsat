@@ -39,6 +39,24 @@ classification (LC_Type1):
 \item 17: Water Bodies
 }
 }
+\examples{
+\dontrun{
+  # Retrieve land cover for a bounding box
+  lc_raster <- get_landcover(c(6, 35, 19, 47), year=2024)
+  terra::plot(lc_raster)
+
+  # Retrieve land cover for specific coordinates
+  coords <- cbind(runif(n=100, 6, 19), runif(n=100, 35, 47))
+  lc_points <- get_landcover(coords, year=2024)
+  print(lc_points)
+}
+
+}
+\references{
+Friedl, M. A., & Sulla-Menashe, D. (2021). MODIS/Terra+Aqua Land Cover Type
+Yearly L3 Global 500m SIN Grid V061 (MCD12Q1). NASA LP DAAC.
+https://doi.org/10.5067/MODIS/MCD12Q1.061
+}
 \author{
 Abdollah Jalilian
 }
