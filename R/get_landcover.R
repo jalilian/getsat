@@ -9,10 +9,10 @@
 #' with two columns (longitude, latitude) specifying the spatial region of interest.
 #' Bounding box format: c(xmin, ymin, xmax, ymax).
 #'
-#' @param year An integer specifying the year (2001 to 2023). Default is 2023.
+#' @param year An integer specifying the year (2001 to 2024). Default is 2024.
 #'
 #' @param downloaddir A character string specifying the directory where HDF tiles
-#' are stored. Defaults to a "MODIS_Year" folder in your system Downloads.
+#' are stored. Defaults to your system Downloads.
 #'
 #' @details
 #' The function uses the NASA CMR API to find the exact sinusoidal tiles (e.g., h10v04)
@@ -20,10 +20,26 @@
 #' the function will open your browser for the first missing tile to initiate a session.
 #'
 #' The returned raster uses the IGBP (International Geosphere-Biosphere Programme)
-#' classification (LC_Type1):
-#' - 11: Permanent Wetlands
-#' - 12: Croplands
-#' - 17: Water Bodies
+#' classification (LC_Type1). The 17 categories are:
+#' \itemize{
+#'   \item \strong{1:} Evergreen Needleleaf Forests
+#'   \item \strong{2:} Evergreen Broadleaf Forests
+#'   \item \strong{3:} Deciduous Needleleaf Forests
+#'   \item \strong{4:} Deciduous Broadleaf Forests
+#'   \item \strong{5:} Mixed Forests
+#'   \item \strong{6:} Closed Shrublands
+#'   \item \strong{7:} Open Shrublands
+#'   \item \strong{8:} Woody Savannas
+#'   \item \strong{9:} Savannas
+#'   \item \strong{10:} Grasslands
+#'   \item \strong{11:} \strong{Permanent Wetlands} (Land with a permanent mixture of vegetation and water)
+#'   \item \strong{12:} \strong{Croplands} (Lands covered with temporary crops)
+#'   \item \strong{13:} Urban and Built-up Lands
+#'   \item \strong{14:} Cropland/Natural Vegetation Mosaics
+#'   \item \strong{15:} Permanent Snow and Ice
+#'   \item \strong{16:} Barren (Sparsely vegetated)
+#'   \item \strong{17:} \strong{Water Bodies} (Oceans, seas, lakes, reservoirs, rivers)
+#' }
 #'
 #' @return If 'where' is a bounding box, returns a SpatRaster cropped to the region.
 #' If 'where' is a coordinate set, returns a data frame with extracted LC values.
@@ -36,11 +52,11 @@
 #' @examples
 #' \dontrun{
 #'   # Retrieve land cover for a bounding box
-#'   lc_raster <- get_landcover(c(6, 35, 19, 47), year=2024)
+#'   lc_raster <- get_landcover(c(47, 34, 48, 35), year=2024)
 #'   terra::plot(lc_raster)
 #'
 #'   # Retrieve land cover for specific coordinates
-#'   coords <- cbind(runif(n=100, 6, 19), runif(n=100, 35, 47))
+#'   coords <- cbind(runif(n=100, 47, 48), runif(n=100, 34, 35))
 #'   lc_points <- get_landcover(coords, year=2024)
 #'   print(lc_points)
 #' }
@@ -49,8 +65,8 @@
 #'
 #' @export
 get_landcover <- function(where,
-                          year = 2023,
-                          downloaddir = NULL)
+                          year=2024,
+                          downloaddir=NULL)
 {
   # validate input: bounding box or coordinate matrix/data frame
   if (is.numeric(where) && length(where) == 4)
@@ -70,7 +86,7 @@ get_landcover <- function(where,
 
   # validate year
   if (year < 2001 || year > 2024)
-    stop("Year must be between 2001 and 2023.")
+    stop("Year must be between 2001 and 2024.")
 
   # set the default download directory
   if (is.null(downloaddir))
@@ -87,7 +103,7 @@ get_landcover <- function(where,
   message("Querying NASA CMR API for year ", year, "...")
   q <- list(collection_concept_id="C2484079608-LPCLOUD",
             temporal=paste0(year, "-01-01T00:00:00Z,", year, "-12-31T23:59:59Z"),
-            bounding_box=paste(bbox, collapse = ","),
+            bounding_box=paste(bbox, collapse=","),
             page_size=2000)
   res <- httr::GET("https://cmr.earthdata.nasa.gov/search/granules.json", query=q)
   httr::stop_for_status(res)
@@ -137,23 +153,29 @@ get_landcover <- function(where,
   if (length(tile_files) == 0)
     stop("No HDF files found in: ", downloaddir)
 
-  # target extent in WGS84
-  wgs84_ext <- terra::as.polygons(
-    terra::ext(bbox[1], bbox[3], bbox[2], bbox[4]), crs="EPSG:4326")
   # load and process raster data
   message("Mosaicing and reprojecting...")
   rast_list <- lapply(tile_files, function(f) {
     r <- terra::rast(f)
-    # extract LC_Type1 (Layer 1) from each HDF
-    lname <- grep("LC_Type1", names(r), value = TRUE)
+    lname <- grep("LC_Type1", names(r), value=TRUE)
     if (length(lname) == 0)
       stop("LC_Type1 layer not found in: ", f)
-    r <- r[[lname]]
-    # crop
-    terra::crop(r, terra::project(wgs84_ext, terra::crs(r)))
+    r[[lname]]
   })
-  rdata <- do.call(terra::mosaic, rast_list)
+
+  if (length(rast_list) == 0)
+    stop("No raster tiles could be loaded.")
+  # mosaic tiles
+  if (length(rast_list) == 1)
+  {
+    rdata <- rast_list[[1]]
+  } else {
+    rdata <- do.call(terra::mosaic, c(rast_list, list(fun="first")))
+  }
+  # project to  WGS84 and then crop to the area
   rdata <- terra::project(rdata, "EPSG:4326", method="near")
+  rdata <- terra::crop(rdata, terra::as.polygons(
+    terra::ext(bbox[1], bbox[3], bbox[2], bbox[4]), crs="EPSG:4326"))
 
   # if input was points, extract and return
   if (inherits(where, c("matrix", "data.frame")))
