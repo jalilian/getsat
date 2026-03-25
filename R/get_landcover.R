@@ -58,10 +58,10 @@ get_landcover <- function(where,
   # set the default download directory
   if (is.null(downloaddir))
   {
-    downloaddir <- file.path(Sys.getenv("HOME"), "Downloads", paste0("MODIS_", year))
+    downloaddir <- file.path(Sys.getenv("HOME"), "Downloads")
     if (Sys.info()["sysname"] == "Windows")
-      downloaddir <- gsub("\\\\", "/", file.path(Sys.getenv("USERPROFILE"),
-                                                 "Downloads", paste0("MODIS_", year)))
+      downloaddir <- gsub("\\\\", "/",
+                          file.path(Sys.getenv("USERPROFILE"), "Downloads"))
   }
   if (!dir.exists(downloaddir))
     dir.create(downloaddir, recursive=TRUE)
