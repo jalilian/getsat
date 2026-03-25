@@ -9,7 +9,7 @@ get_popdensity(where, year = 2020, res = "30_sec", downloaddir = NULL)
 \arguments{
 \item{where}{A numeric vector of length 4 (bounding box) or a matrix/data.frame with two columns (longitude, latitude) specifying the spatial region of interest. If a bounding box is provided, the coordinates should be in the format: c(xmin, ymin, xmax, ymax).}
 
-\item{year}{An integer specifying the year for which the population density data is required. Valid values are: 2000, 2005, 2011, 2015, and 2020. The default is 2020.}
+\item{year}{An integer specifying the year for which the population density data is required. Valid values are: 2000, 2005, 2010, 2015, and 2020. The default is 2020.}
 
 \item{res}{A character string specifying the resolution of the population density data. Options include:
 \itemize{
@@ -40,7 +40,7 @@ proportional allocation gridding algorithm that assigns UN WPP-adjusted
 population counts to global grid cells.
 }
 \details{
-The available years are 2000, 2005, 2011, 2015, and 2020.
+The available years are 2000, 2005, 2010, 2015, and 2020.
 
 The data are provided as global rasters at the following resolutions:
 \itemize{
@@ -66,7 +66,7 @@ For more information on the dataset and access to the data, visit:
  terra::plot(pd1)
 
  # Get population density for specific coordinates
- coords <- cbind(runif(n = 100, -5, -1), runif(n = 100, 4, 10))
+ coords <- cbind(runif(n=100, -5, -1), runif(n=100, 4, 10))
  pd2 <- get_popdensity(coords, year=2020, res="1_deg")
  print(pd2)
 }
