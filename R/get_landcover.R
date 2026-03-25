@@ -52,7 +52,7 @@ get_landcover <- function(where,
     stop("Bounding box must be in the format c(xmin, ymin, xmax, ymax) with valid coordinates.")
 
   # validate year
-  if (year < 2001 || year > 2023)
+  if (year < 2001 || year > 2024)
     stop("Year must be between 2001 and 2023.")
 
   # set the default download directory
@@ -92,7 +92,9 @@ get_landcover <- function(where,
   # check for missing files and trigger Browser authentication
   tile_id <- function(x) { sub(".*(h[0-9]{2}v[0-9]{2}).*", "\\1", x) }
   expected_tiles <- unique(tile_id(hdf_links))
-  existing_files <- list.files(downloaddir, pattern="\\.hdf$", full.names=TRUE)
+  existing_files <- list.files(downloaddir,
+                               pattern=paste0("A", year, ".*\\.hdf$"),
+                               full.names=TRUE)
   existing_tiles <- unique(tile_id(existing_files))
   missing_links <- hdf_links[tile_id(hdf_links) %in%
                                setdiff(expected_tiles, existing_tiles)]
@@ -106,7 +108,9 @@ get_landcover <- function(where,
     readline()
   }
   # re-check after download
-  existing_files <- list.files(downloaddir, pattern="\\.hdf$", full.names=TRUE)
+  existing_files <- list.files(downloaddir,
+                               pattern=paste0("A", year, ".*\\.hdf$"),
+                               full.names=TRUE)
   existing_tiles <- unique(tile_id(existing_files))
   if (length(setdiff(expected_tiles, existing_tiles)) > 0)
     stop("Some required tiles are still missing in: ", downloaddir)
