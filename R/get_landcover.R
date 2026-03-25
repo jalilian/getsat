@@ -98,7 +98,7 @@ get_landcover <- function(where,
                                setdiff(expected_tiles, existing_tiles)]
   if (length(missing_links) > 0)
   {
-    utils::browseURL(missing_links[1])
+    sapply(missing_links, utils::browseURL)
     message("Found ", length(missing_links), " missing tiles.\n",
             "1) Log in to NASA Earthdata in the browser.\n",
             "2) Download the tiles to: ", downloaddir)
