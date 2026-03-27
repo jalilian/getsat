@@ -98,7 +98,7 @@ get_chelsa <- function(where, var="clt",  year=2023, month=1)
     {
       message("Monthly file not found. Aggregating daily files for ", year, "-", m)
       # determine number of days in the requested month
-      start <- as.Date(sprintf("%d-%02d-01", year, m))
+      start <- as.Date(sprintf("%d-%s-01", year, m))
       days_in_month <- as.integer(seq(start, by="month", length.out=2)[2] - start)
       daily_layers <- list()
       for (d in 1:days_in_month)
@@ -122,7 +122,7 @@ get_chelsa <- function(where, var="clt",  year=2023, month=1)
         stop("No daily files found for month ", m, " in year ", year)
       # stack all daily layers and calculate the Mean (aggregate to monthly)
       monthly_stack <- terra::rast(daily_layers)
-      fun <- if (var %in% c("pr", "prec")) "sum" else "mean"
+      fun <- if (var %in% c("pr", "prec", "precip")) "sum" else "mean"
       rout <- terra::app(monthly_stack, fun=fun, na.rm=TRUE)
     }
     rdata[[m]] <- rout
