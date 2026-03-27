@@ -43,12 +43,12 @@ Space Agency. Failure to do so may violate the data usage policies.
 \examples{
 \dontrun{
   # Retrieve DEM for a bounding box
-  dem_raster <- get_dem(c(-3, 5, -2, 6), res = 90)
+  dem_raster <- get_dem(c(-3, 5, -2, 6), res=90)
   plot(dem_raster)
 
   # Retrieve DEM for specific coordinates
-  coords <- cbind(runif(n = 100, -3, -2), runif(n = 100, 5, 6))
-  dem_points <- get_dem(coords, res = 90)
+  coords <- cbind(runif(n=100, -3, -2), runif(n=100, 5, 6))
+  dem_points <- get_dem(coords, res=90)
   print(dem_points)
 }
 

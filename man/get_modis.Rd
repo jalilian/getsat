@@ -38,7 +38,7 @@ on the selected variable.}
 \item{crop}{Logical, whether to crop the retrieved raster data to the bounding box. Default is TRUE.}
 
 \item{w}{Window size for the moving window method to fill missing (NA) values using the \code{focal} function from the \code{terra} package.
-If \code{w = NA} (default), missing values are not filled. See the documentation of \code{terra::focal} for more details.}
+If \code{w=NA} (default), missing values are not filled. See the documentation of \code{terra::focal} for more details.}
 
 \item{agglevel}{A character string specifying the temporal aggregation level for the retrieved data, using the \code{aggregate} function
 in the \code{terra} package. Available options include:
@@ -62,7 +62,7 @@ If \code{FALSE} (default), data is read directly from the server without downloa
 Default is a temporary directory.}
 
 \item{clean_dir}{Logical. If \code{TRUE}, downloaded files are deleted after processing
-(applies only when \code{download = TRUE}). Default is \code{FALSE}.}
+(applies only when \code{download=TRUE}). Default is \code{FALSE}.}
 }
 \description{
 Access and download the Moderate Resolution Imaging Spectroradiometer (MODIS)
@@ -115,14 +115,14 @@ consists of 36 horizontal (h00 to h35) and 18 vertical (v00 to v17) tiles.
 \examples{
 \dontrun{
   # Retrieve 8-day daytime 1km grid land surface temperature for a bounding box
-  temp <- get_modis(c(-3, 5, -2, 6), var = "LST_Day_1KM",
-                    datetime = "2023-11-01/2024-02-28")
+  temp <- get_modis(c(-3, 5, -2, 6), var="LST_Day_1KM",
+                    datetime="2023-11-01/2024-02-28")
   plot(temp)
 
   # Retrieve yearly total evapotranspiration for specific coordinates
-  coords <- cbind(runif(n = 100, -3, -2), runif(n = 100, 5, 6))
+  coords <- cbind(runif(n=100, -3, -2), runif(n=100, 5, 6))
   et_points <- get_modis(coords, var="ET_500m",
-                        datetime = "2023-11-01/2024-02-28")
+                        datetime="2023-11-01/2024-02-28")
   print(et_points)
 }
 
