@@ -349,7 +349,7 @@ get_era5_land <- function(key,
     names(rdata) <- lapply(rdata, function(x) unique(names(x)))
   } else{
     rdata <- list(rdata)
-    names(rdata) <- unique(names(rdata[[1]]))
+    names(rdata) <- vars
   }
 
   # perform temporal aggregation if specified
